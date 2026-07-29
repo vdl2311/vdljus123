@@ -326,9 +326,6 @@ export function AppHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Zap className="h-4 w-4 mr-2" /> Plano Pro · Ativo
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setShowAuthModal(true)}>
               <Mail className="h-4 w-4 mr-2 text-primary" /> Entrar com E-mail / Senha
             </DropdownMenuItem>

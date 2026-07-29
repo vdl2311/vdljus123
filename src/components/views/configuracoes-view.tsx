@@ -399,7 +399,7 @@ export function ConfiguracoesView() {
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold">Plano Pro</p>
+                <p className="text-sm font-semibold">Licença de Uso</p>
                 <p className="text-xs text-muted-foreground">Renovação em 15/08/2026</p>
               </div>
               <Badge className="bg-primary/15 text-primary border-primary/20">Ativo</Badge>

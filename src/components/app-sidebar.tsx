@@ -346,16 +346,6 @@ function SidebarContent({
           collapsed={collapsed}
         />
       </div>
-
-      {/* Rodapé fixo do menu */}
-      {!collapsed && (
-        <div className="border-t border-sidebar-border p-3 shrink-0">
-          <div className="rounded-lg bg-sidebar-accent/50 p-2.5 text-xs text-muted-foreground">
-            <p className="font-medium text-foreground mb-0.5">Plano Pro</p>
-            <p className="text-[11px]">DataJud e Firebase Conectados</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
