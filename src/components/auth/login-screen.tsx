@@ -90,7 +90,7 @@ export function LoginScreen() {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 mb-1">
             <Scale className="h-7 w-7" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">JurisFlow</h1>
+          <h1 className="text-2xl font-bold tracking-tight">VDL Juris</h1>
           <p className="text-xs text-muted-foreground max-w-xs mx-auto">
             Plataforma de Gestão Jurídica Inteligente & Acompanhamento Processual
           </p>

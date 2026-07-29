@@ -153,9 +153,11 @@ export function AppHeader() {
         {/* Title & Breadcrumb */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
-            <span>JurisFlow</span>
+            <span>VDL Juris</span>
             <span>/</span>
-            <span className="font-medium text-foreground">{dynamicInfo.title}</span>
+            <span className="font-medium text-foreground">
+              {currentView === "dashboard" ? "Dashboard" : info.title}
+            </span>
           </div>
           <h1 className="text-base md:text-lg font-semibold leading-tight truncate">
             {dynamicInfo.title}

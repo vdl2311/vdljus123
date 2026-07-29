@@ -107,7 +107,7 @@ export function AuthModal({
               <Scale className="h-6 w-6" />
             </div>
             <DialogTitle className="text-xl font-bold tracking-tight">
-              JurisFlow · Acesso Seguro
+              VDL Juris · Acesso Seguro
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Sistema de Gestão Jurídica com Controle de Acesso Restrito

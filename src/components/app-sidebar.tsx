@@ -204,7 +204,7 @@ export function AppSidebar() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                     <Scale className="h-4 w-4" />
                   </div>
-                  <span className="font-bold text-base">JurisFlow</span>
+                  <span className="font-bold text-base">VDL Juris</span>
                 </div>
                 <Button
                   variant="ghost"
@@ -284,7 +284,7 @@ function SidebarContent({
           {!collapsed && (
             <div className="flex flex-col leading-none overflow-hidden">
               <span className="font-bold text-[15px] tracking-tight truncate">
-                JurisFlow
+                VDL Juris
               </span>
               <span className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">
                 v2 · 2026
