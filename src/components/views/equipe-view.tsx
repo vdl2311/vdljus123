@@ -715,6 +715,7 @@ function MembroDialog({
             <div className="grid gap-2">
               <Label>Telefone</Label>
               <Input
+                mask="phone"
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
                 placeholder="(11) 99999-9999"

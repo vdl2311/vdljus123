@@ -285,6 +285,7 @@ export function ProcessosView() {
                       <div className="flex gap-2">
                         <Input
                           id="cnj"
+                          mask="cnj"
                           placeholder="0000000-00.0000.0.00.0000"
                           value={cnjInput}
                           onChange={(e) => setCnjInput(e.target.value)}

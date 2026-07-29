@@ -346,7 +346,7 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
           </div>
           <div className="grid gap-2">
             <Label>CPF / CNPJ</Label>
-            <Input value={cpfCnpj} onChange={(e) => setCpfCnpj(e.target.value)} placeholder="00.000.000/0001-00" />
+            <Input mask="cpf-cnpj" value={cpfCnpj} onChange={(e) => setCpfCnpj(e.target.value)} placeholder="00.000.000/0001-00" />
           </div>
         </div>
         <div className="grid gap-2">
@@ -356,7 +356,7 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
             <Label>Telefone</Label>
-            <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(11) 3000-0000" />
+            <Input mask="phone" value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(11) 99999-9999" />
           </div>
           <div className="grid gap-2">
             <Label>Cidade / UF</Label>
