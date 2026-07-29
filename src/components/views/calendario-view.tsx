@@ -58,8 +58,8 @@ export function CalendarioView() {
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { locale: ptBR, weekStartsOn: 1 });
+  const calendarEnd = endOfWeek(monthEnd, { locale: ptBR, weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const eventosDoDia = (date: Date) =>
@@ -78,7 +78,7 @@ export function CalendarioView() {
     .sort((a, b) => a.data.localeCompare(b.data))
     .slice(0, 8);
 
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
   // Stats
   const stats = {
