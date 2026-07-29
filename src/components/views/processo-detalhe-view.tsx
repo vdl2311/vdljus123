@@ -28,8 +28,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/lib/store";
-import { formatCurrency } from "@/lib/format";
-import { format, differenceInDays, parseISO } from "date-fns";
+import { formatCurrency, safeDate, formatDateSafe } from "@/lib/format";
+import { differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -56,13 +56,14 @@ export function ProcessoDetalheView() {
     );
   }
 
-  const diasPrazo = processo.datasImportantes.prazoFatal
-    ? differenceInDays(new Date(processo.datasImportantes.prazoFatal), new Date())
-    : null;
+  const prazoFatalDate = safeDate(processo?.datasImportantes?.prazoFatal);
+  const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
 
-  const movimentacoesOrdenadas = [...processo.movimentacoes].sort(
-    (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-  );
+  const movimentacoesOrdenadas = [...(processo?.movimentacoes || [])].sort((a, b) => {
+    const da = safeDate(a.data)?.getTime() || 0;
+    const db = safeDate(b.data)?.getTime() || 0;
+    return db - da;
+  });
 
   async function sincronizar() {
     if (!processo) return;
@@ -222,7 +223,7 @@ export function ProcessoDetalheView() {
 
               <div className="space-y-5">
                 {movimentacoesOrdenadas.map((m, idx) => {
-                  const date = parseISO(m.data);
+                  const date = safeDate(m.data) || new Date();
                   const isLatest = idx === 0;
                   return (
                     <motion.div
@@ -260,10 +261,10 @@ export function ProcessoDetalheView() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-semibold tabular-nums">
-                            {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            {formatDateSafe(m.data, "dd 'de' MMMM 'de' yyyy")}
                           </span>
                           <Badge variant="outline" className="text-xs">
-                            {m.fonte}
+                            {m.fonte || "Sistema"}
                           </Badge>
                           <Badge
                             variant="outline"
@@ -381,7 +382,7 @@ export function ProcessoDetalheView() {
                 {formatCurrency(processo.valorCausa)}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Última sincronização: {format(new Date(processo.ultimaSincronizacaoDataJud), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                Última sincronização: {formatDateSafe(processo.ultimaSincronizacaoDataJud, "dd/MM/yyyy 'às' HH:mm")}
               </p>
             </CardContent>
           </Card>
@@ -430,7 +431,7 @@ function DateRow({
       <div>
         <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
         <p className="text-sm font-medium">
-          {format(parseISO(value), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+          {formatDateSafe(value, "dd 'de' MMMM 'de' yyyy")}
         </p>
       </div>
       {countdown !== null && countdown !== undefined && (
@@ -461,7 +462,7 @@ function DocumentoRow({ documentoId }: { documentoId: string; key?: string }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{doc.nome}</p>
         <p className="text-xs text-muted-foreground">
-          {doc.tipo} · {doc.tamanho} · {format(new Date(doc.dataUpload), "dd/MM/yyyy")}
+          {doc.tipo} · {doc.tamanho} · {formatDateSafe(doc.dataUpload)}
         </p>
       </div>
       <Badge variant="outline" className="text-xs">

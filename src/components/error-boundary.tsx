@@ -70,8 +70,8 @@ function DefaultErrorFallback({
       <p className="text-sm text-muted-foreground max-w-md mb-1">
         Ocorreu um erro inesperado ao carregar esta tela.
       </p>
-      {!isProd && (
-        <pre className="mt-3 mb-3 p-3 rounded-lg bg-muted text-xs text-left max-w-2xl overflow-x-auto font-mono">
+      {error?.message && (
+        <pre className="mt-3 mb-3 p-3 rounded-lg bg-muted text-xs text-left max-w-2xl overflow-x-auto font-mono text-destructive">
           {error.message}
         </pre>
       )}

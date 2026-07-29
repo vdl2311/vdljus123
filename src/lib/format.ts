@@ -1,5 +1,40 @@
 // Formatadores e Máscaras utilitários para VDL Juris
 
+import { format as fnsFormat, parseISO, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export function safeDate(dateVal: any): Date | null {
+  if (!dateVal) return null;
+  if (dateVal instanceof Date) {
+    return isValid(dateVal) ? dateVal : null;
+  }
+  if (typeof dateVal === "string") {
+    const parsed = parseISO(dateVal);
+    if (isValid(parsed)) return parsed;
+    const d = new Date(dateVal);
+    if (isValid(d)) return d;
+  }
+  if (typeof dateVal === "number") {
+    const d = new Date(dateVal);
+    if (isValid(d)) return d;
+  }
+  return null;
+}
+
+export function formatDateSafe(
+  dateVal: any,
+  pattern: string = "dd/MM/yyyy",
+  fallback: string = "--"
+): string {
+  const d = safeDate(dateVal);
+  if (!d) return fallback;
+  try {
+    return fnsFormat(d, pattern, { locale: ptBR });
+  } catch {
+    return fallback;
+  }
+}
+
 export type MaskType = "cnj" | "cpf" | "cnpj" | "cpf-cnpj" | "phone" | "cep" | "date" | "currency";
 
 export function maskCNJ(value: string): string {

@@ -42,7 +42,7 @@ import {
   Cell,
 } from "recharts";
 import { motion } from "framer-motion";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, safeDate, formatDateSafe } from "@/lib/format";
 import { format, isToday, isTomorrow, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -51,41 +51,45 @@ export function DashboardView() {
   const { processos, tarefas, clientes, inbox, setView, openProcesso, setAiPanelOpen } = useAppStore();
 
   const processosPrioritarios = React.useMemo(() => {
-    return [...processos]
-      .filter((p) => p.status === "Ativo" || p.status === "Em Recurso")
+    return [...(processos || [])]
+      .filter((p) => p && (p.status === "Ativo" || p.status === "Em Recurso"))
       .sort((a, b) => {
-        const aDate = a.datasImportantes.prazoFatal
-          ? new Date(a.datasImportantes.prazoFatal).getTime()
-          : Infinity;
-        const bDate = b.datasImportantes.prazoFatal
-          ? new Date(b.datasImportantes.prazoFatal).getTime()
-          : Infinity;
+        const aDate = safeDate(a.datasImportantes?.prazoFatal)?.getTime() || Infinity;
+        const bDate = safeDate(b.datasImportantes?.prazoFatal)?.getTime() || Infinity;
         return aDate - bDate;
       })
       .slice(0, 4);
   }, [processos]);
 
   const tarefasUrgentes = React.useMemo(() => {
-    return [...tarefas]
-      .filter((t) => t.status !== "Concluído")
+    return [...(tarefas || [])]
+      .filter((t) => t && t.status !== "Concluído")
       .sort((a, b) => {
-        const aDate = new Date(a.dataLimite).getTime();
-        const bDate = new Date(b.dataLimite).getTime();
+        const aDate = safeDate(a.dataLimite)?.getTime() || Infinity;
+        const bDate = safeDate(b.dataLimite)?.getTime() || Infinity;
         return aDate - bDate;
       })
       .slice(0, 5);
   }, [tarefas]);
 
-  const inboxNaoLidos = inbox.filter((i) => !i.lido && !i.arquivado).slice(0, 4);
+  const inboxNaoLidos = (inbox || []).filter((i) => i && !i.lido && !i.arquivado).slice(0, 4);
   const agendaProximos = eventosAgenda.slice(0, 5);
 
-  const processosAtivosCount = processos.filter(p => p.status === "Ativo" || p.status === "Em Recurso").length;
-  const clientesAtivosCount = clientes.filter(c => c.status === "Ativo" || c.status === "Potencial").length; // ou filter apenas Ativo
-  const prazosProximos7DiasCount = tarefas.filter(t => t.status !== "Concluído" && differenceInDays(new Date(t.dataLimite), new Date()) <= 7 && differenceInDays(new Date(t.dataLimite), new Date()) >= 0).length;
+  const processosAtivosCount = (processos || []).filter(p => p && (p.status === "Ativo" || p.status === "Em Recurso")).length;
+  const clientesAtivosCount = (clientes || []).filter(c => c && (c.status === "Ativo" || c.status === "Potencial")).length;
+  const prazosProximos7DiasCount = (tarefas || []).filter(t => {
+    if (!t || t.status === "Concluído") return false;
+    const d = safeDate(t.dataLimite);
+    if (!d) return false;
+    const diff = differenceInDays(d, new Date());
+    return diff >= 0 && diff <= 7;
+  }).length;
 
   const processosPorAreaComputed = React.useMemo(() => {
-    const counts = processos.reduce((acc, p) => {
-      acc[p.area] = (acc[p.area] || 0) + 1;
+    const counts = (processos || []).reduce((acc, p) => {
+      if (!p) return acc;
+      const area = p.area || "Outros";
+      acc[area] = (acc[area] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
@@ -343,9 +347,8 @@ export function DashboardView() {
           <CardContent className="p-0">
             <div className="divide-y">
               {processosPrioritarios.map((p) => {
-                const diasPrazo = p.datasImportantes.prazoFatal
-                  ? differenceInDays(new Date(p.datasImportantes.prazoFatal), new Date())
-                  : null;
+                const prazoFatalDate = safeDate(p.datasImportantes?.prazoFatal);
+                const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
                 return (
                   <button
                     key={p.id}
@@ -360,7 +363,7 @@ export function DashboardView() {
                         p.risco === "Baixo" && "bg-success/10 text-success"
                       )}
                     >
-                      {p.area.slice(0, 3).toUpperCase()}
+                      {(p.area || "Cível").slice(0, 3).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
@@ -461,7 +464,7 @@ export function DashboardView() {
             <ScrollArea className="h-[280px]">
               <div className="divide-y">
                 {tarefasUrgentes.map((t) => {
-                  const date = new Date(t.dataLimite);
+                  const date = safeDate(t.dataLimite) || new Date();
                   const dias = differenceInDays(date, new Date());
                   return (
                     <div key={t.id} className="flex gap-3 p-3 hover:bg-accent/40 transition-colors">

@@ -39,8 +39,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { useAppStore } from "@/lib/store";
 import type { Processo, ProcessoArea, ProcessoRisco, ProcessoStatus, ProcessoFase } from "@/lib/types";
-import { formatCurrency } from "@/lib/format";
-import { format, differenceInDays } from "date-fns";
+import { formatCurrency, safeDate, formatDateSafe } from "@/lib/format";
+import { differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -99,17 +99,26 @@ export function ProcessosView() {
   const [loading, setLoading] = React.useState(false);
 
   const filtered = React.useMemo(() => {
-    return processos.filter((p) => {
-      const q = processoSearch.toLowerCase();
+    return (processos || []).filter((p) => {
+      if (!p) return false;
+      const q = (processoSearch || "").toLowerCase();
+      const numCnj = (p.numeroCnj || "").toLowerCase();
+      const clienteNome = (p.clienteNome || "").toLowerCase();
+      const assunto = (p.assunto || "").toLowerCase();
+      const tribunal = (p.tribunal || "").toLowerCase();
+      const tags = p.tags || [];
+      const poloAtivo = (p.partes?.poloAtivo || "").toLowerCase();
+      const poloPassivo = (p.partes?.poloPassivo || "").toLowerCase();
+
       const matchSearch =
         !q ||
-        p.numeroCnj.toLowerCase().includes(q) ||
-        p.clienteNome.toLowerCase().includes(q) ||
-        p.assunto.toLowerCase().includes(q) ||
-        p.tribunal.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q)) ||
-        p.partes.poloAtivo.toLowerCase().includes(q) ||
-        p.partes.poloPassivo.toLowerCase().includes(q);
+        numCnj.includes(q) ||
+        clienteNome.includes(q) ||
+        assunto.includes(q) ||
+        tribunal.includes(q) ||
+        tags.some((t) => (t || "").toLowerCase().includes(q)) ||
+        poloAtivo.includes(q) ||
+        poloPassivo.includes(q);
 
       const matchStatus =
         processoStatusFilter === "todos" || p.status === processoStatusFilter;
@@ -337,7 +346,7 @@ export function ProcessosView() {
                           </div>
                           <div>
                             <span className="text-muted-foreground">Distribuição:</span>{" "}
-                            <strong>{format(new Date(datajudResult.dataDistribuicao), "dd/MM/yyyy")}</strong>
+                            <strong>{formatDateSafe(datajudResult.dataDistribuicao)}</strong>
                           </div>
                           <div className="col-span-2">
                             <span className="text-muted-foreground">Movimentações:</span>{" "}
@@ -418,11 +427,10 @@ function ProcessoCard({
   onOpen: () => void;
   index: number;
 }) {
-  const diasPrazo = processo.datasImportantes.prazoFatal
-    ? differenceInDays(new Date(processo.datasImportantes.prazoFatal), new Date())
-    : null;
+  const prazoFatalDate = safeDate(processo.datasImportantes?.prazoFatal);
+  const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
 
-  const movimentacoesRecentes = processo.movimentacoes.slice(0, 2);
+  const movimentacoesRecentes = (processo.movimentacoes || []).slice(0, 2);
 
   return (
     <motion.div
@@ -446,7 +454,7 @@ function ProcessoCard({
                   processo.risco === "Baixo" && "bg-success/10 text-success"
                 )}
               >
-                {processo.area.slice(0, 3).toUpperCase()}
+                {(processo.area || "Cível").slice(0, 3).toUpperCase()}
               </div>
               <div className="lg:hidden flex-1" />
               <div className="hidden lg:block">
@@ -461,7 +469,7 @@ function ProcessoCard({
                     processo.risco === "Baixo" && "text-success"
                   )}
                 >
-                  {processo.risco}
+                  {processo.risco || "Médio"}
                 </p>
               </div>
             </div>
@@ -472,12 +480,12 @@ function ProcessoCard({
                 <div className="min-w-0">
                   <p className="font-mono text-xs text-muted-foreground">{processo.numeroCnj}</p>
                   <h3 className="font-semibold text-sm leading-tight mt-0.5 truncate">
-                    {processo.clienteNome} · {processo.assunto}
+                    {processo.clienteNome || "Sem cliente"} · {processo.assunto || "Sem assunto"}
                   </h3>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <Badge variant="outline" className="text-xs">
-                    {processo.status}
+                    {processo.status || "Ativo"}
                   </Badge>
                   {diasPrazo !== null && (
                     <Badge
@@ -492,12 +500,12 @@ function ProcessoCard({
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                <InfoItem label="Tribunal" value={processo.tribunal} />
-                <InfoItem label="Área" value={processo.area} />
-                <InfoItem label="Valor" value={formatCurrency(processo.valorCausa)} />
+                <InfoItem label="Tribunal" value={processo.tribunal || "--"} />
+                <InfoItem label="Área" value={processo.area || "--"} />
+                <InfoItem label="Valor" value={formatCurrency(processo.valorCausa || 0)} />
                 <InfoItem
                   label="Última sync"
-                  value={format(new Date(processo.ultimaSincronizacaoDataJud), "dd/MM HH:mm", { locale: ptBR })}
+                  value={formatDateSafe(processo.ultimaSincronizacaoDataJud, "dd/MM HH:mm")}
                 />
               </div>
 
@@ -508,7 +516,7 @@ function ProcessoCard({
                     <div key={m.id} className="flex items-start gap-2 text-xs">
                       <Calendar className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
                       <span className="text-muted-foreground tabular-nums shrink-0">
-                        {format(new Date(m.data), "dd/MM")}
+                        {formatDateSafe(m.data, "dd/MM")}
                       </span>
                       <span className="truncate">{m.descricao}</span>
                       {m.alertaIa && (
@@ -523,7 +531,7 @@ function ProcessoCard({
               )}
 
               {/* Tags */}
-              {processo.tags.length > 0 && (
+              {(processo.tags || []).length > 0 && (
                 <div className="flex items-center gap-1.5 mt-3 flex-wrap">
                   <Tag className="h-3 w-3 text-muted-foreground" />
                   {processo.tags.map((t) => (
@@ -640,9 +648,8 @@ function KanbanColumn({
 }
 
 function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => void }) {
-  const diasPrazo = processo.datasImportantes.prazoFatal
-    ? differenceInDays(new Date(processo.datasImportantes.prazoFatal), new Date())
-    : null;
+  const prazoFatalDate = safeDate(processo.datasImportantes?.prazoFatal);
+  const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
 
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.setData("text/plain", processo.id);
@@ -666,24 +673,24 @@ function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => vo
               processo.risco === "Baixo" && "border-success/30 bg-success/10 text-success"
             )}
           >
-            Risco {processo.risco}
+            Risco {processo.risco || "Médio"}
           </Badge>
           <span className="text-xs text-muted-foreground font-mono bg-muted px-1.5 rounded-sm">
-            {processo.numeroCnj.split("-")[0]}
+            {processo.numeroCnj ? processo.numeroCnj.split("-")[0] : ""}
           </span>
         </div>
         
         <div>
-          <p className="font-semibold text-sm leading-tight line-clamp-2">{processo.clienteNome}</p>
-          <p className="text-xs text-muted-foreground mt-1 truncate">{processo.assunto}</p>
+          <p className="font-semibold text-sm leading-tight line-clamp-2">{processo.clienteNome || "Sem cliente"}</p>
+          <p className="text-xs text-muted-foreground mt-1 truncate">{processo.assunto || "Sem assunto"}</p>
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-border/60">
           <div className="flex items-center gap-1.5 min-w-0 pr-2">
             <div className="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-              {processo.area.slice(0, 1)}
+              {(processo.area || "Cível").slice(0, 1)}
             </div>
-            <span className="text-xs text-muted-foreground truncate">{processo.tribunal}</span>
+            <span className="text-xs text-muted-foreground truncate">{processo.tribunal || "--"}</span>
           </div>
           
           {diasPrazo !== null && (
