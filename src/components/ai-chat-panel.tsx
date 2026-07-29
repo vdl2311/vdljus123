@@ -94,9 +94,13 @@ export function AiChatPanel() {
         }),
       });
 
-      if (!res.ok) throw new Error("Falha na resposta");
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
 
-      const data = await res.json();
+      if (!res.ok || !data) throw new Error(data?.error || "Falha na resposta da IA");
 
       setLocalMessages((prev) =>
         prev.map((m) =>

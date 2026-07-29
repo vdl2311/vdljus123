@@ -382,8 +382,12 @@ function AnaliseDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ texto, tipoDocumento: tipo }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro na análise do documento");
       setResultado(data);
       toast.success("Análise concluída!");
     } catch {

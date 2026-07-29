@@ -109,12 +109,26 @@ export const datajudService = {
         body: JSON.stringify({ numeroCnj }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Falha na resposta do servidor DataJud");
+      const responseText = await response.text();
+      let responseData: any = null;
+      if (responseText) {
+        try {
+          responseData = JSON.parse(responseText);
+        } catch {
+          // Content was not valid JSON
+        }
       }
 
-      const resultado: DataJudConsultaResult = await response.json();
+      if (!response.ok) {
+        const errorMsg = responseData?.error || `Erro ${response.status}: Falha na comunicação com o serviço DataJud.`;
+        throw new Error(errorMsg);
+      }
+
+      if (!responseData) {
+        throw new Error("Serviço DataJud retornou resposta em branco.");
+      }
+
+      const resultado: DataJudConsultaResult = responseData;
 
       // Salva a consulta no Firebase Firestore para auditoria e histórico
       const consultaId = `dj-${Date.now()}`;

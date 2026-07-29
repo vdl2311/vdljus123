@@ -117,16 +117,21 @@ function ChatTab() {
         body: JSON.stringify({ messages: history }),
       });
 
-      if (!res.ok) throw new Error();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
 
-      const data = await res.json();
+      if (!res.ok || !data) throw new Error(data?.error || "Erro ao consultar o Copiloto");
+
       setMessages((prev) =>
         prev.map((m) =>
           m.id === pendingMsg.id
             ? {
                 ...m,
                 pending: false,
-                content: data.content,
+                content: data.content || "Não foi possível gerar resposta.",
                 sugestoes: data.sugestoes || [],
               }
             : m
@@ -302,9 +307,13 @@ function PecaTab() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tipo, contexto, partes, fatos, pedidos }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setResultado(data.content);
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro ao gerar minuta da peça");
+      setResultado(data.pecaMarkdown || data.content || "Minuta gerada com sucesso.");
       toast.success("Peça gerada!");
     } catch {
       toast.error("Erro ao gerar peça");

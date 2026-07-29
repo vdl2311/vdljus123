@@ -199,6 +199,147 @@ Forneça uma minuta completa, bem estruturada em Markdown com fundamentação le
   }
 });
 
+// POST /api/ai/busca-inteligente
+app.post("/api/ai/busca-inteligente", async (req, res) => {
+  try {
+    const { query, processos = [] } = req.body;
+    if (!query) {
+      return res.status(400).json({ error: "Parâmetro 'query' é obrigatório." });
+    }
+
+    const ai = getAi();
+    const prompt = `Você é o assistente de busca do VDL Juris.
+Sua missão é analisar a consulta do advogado e cruzá-la com o acervo do escritório.
+Pergunta/Termo: "${query}"
+Total de processos no sistema: ${processos.length}
+Amostra dos processos: ${JSON.stringify(processos.slice(0, 10), null, 2)}
+
+Gere uma resposta em JSON válido no seguinte formato:
+{
+  "resumoIa": "A busca encontrou informações relevantes no acervo do escritório...",
+  "processosMatched": [${processos.length > 0 ? `"${processos[0].id}"` : ""}],
+  "respostaDireta": "Explicação técnica detalhada com base no acervo e na legislação.",
+  "proximosPassos": ["Consultar andamento do processo principal", "Analisar prazo de recurso"]
+}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    const raw = response.text || "";
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      return res.json(JSON.parse(match[0]));
+    }
+
+    res.json({
+      resumoIa: "Busca realizada com sucesso no acervo.",
+      processosMatched: processos.slice(0, 2).map((p: any) => p.id),
+      respostaDireta: raw || "Consulta concluída.",
+      proximosPassos: ["Verificar processos selecionados"]
+    });
+  } catch (error: any) {
+    console.error("Erro busca inteligente:", error);
+    res.status(500).json({ error: error.message || "Erro na busca inteligente." });
+  }
+});
+
+// POST /api/ai/explicar-decisao
+app.post("/api/ai/explicar-decisao", async (req, res) => {
+  try {
+    const { texto, contexto } = req.body;
+    if (!texto) {
+      return res.status(400).json({ error: "Texto da decisão é obrigatório." });
+    }
+
+    const ai = getAi();
+    const prompt = `Você é o explicador jurídico do VDL Juris.
+Traduza e analise a seguinte decisão/ementa jurídica de forma simples e acionável:
+Contexto: ${contexto || "Sem contexto"}
+Texto: "${texto.slice(0, 5000)}"
+
+Retorne um JSON válido com a estrutura:
+{
+  "explicacaoSimples": "Linguagem acessível explicando o resultado do julgamento...",
+  "pontosChave": ["Ponto 1", "Ponto 2", "Ponto 3"],
+  "impacto": "Impacto prático para a estratégia do processo"
+}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    const raw = response.text || "";
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      return res.json(JSON.parse(match[0]));
+    }
+
+    res.json({
+      explicacaoSimples: raw || "Análise do julgado concluída.",
+      pontosChave: ["Análise técnica realizada"],
+      impacto: "Manter acompanhamento processual."
+    });
+  } catch (error: any) {
+    console.error("Erro explicar decisão:", error);
+    res.status(500).json({ error: error.message || "Erro ao explicar decisão." });
+  }
+});
+
+// POST /api/ai/pesquisa-global
+app.post("/api/ai/pesquisa-global", async (req, res) => {
+  try {
+    const { query, processos = [], clientes = [], documentos = [], jurisprudencias = [] } = req.body;
+    const ai = getAi();
+
+    const prompt = `Você é o buscador global inteligente do VDL Juris.
+Analise a busca: "${query}"
+Contexto disponível:
+- ${processos.length} processos
+- ${clientes.length} clientes
+- ${documentos.length} documentos
+- ${jurisprudencias.length} jurisprudências
+
+Retorne um JSON válido com o formato:
+{
+  "resumo": "Visão geral dos achados para a busca '${query}'...",
+  "sugestaoIA": "Recomendação proativa sobre a tese ou ação a ser tomada...",
+  "resultados": [
+    {
+      "id": "1",
+      "tipo": "processo",
+      "titulo": "Processo Encontrado",
+      "subtitulo": "Detalhes do item",
+      "relevancia": "Alta",
+      "trechoChave": "Trecho relevante encontrado na pesquisa"
+    }
+  ]
+}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    const raw = response.text || "";
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      return res.json(JSON.parse(match[0]));
+    }
+
+    res.json({
+      resumo: `Resultados para '${query}' no acervo do escritório.`,
+      sugestaoIA: "Revise os itens encontrados para alinhar a tese.",
+      resultados: []
+    });
+  } catch (error: any) {
+    console.error("Erro pesquisa global:", error);
+    res.status(500).json({ error: error.message || "Erro na pesquisa global." });
+  }
+});
+
 // POST /api/datajud/sincronizar
 app.post("/api/datajud/sincronizar", async (req, res) => {
   try {

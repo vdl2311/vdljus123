@@ -78,8 +78,12 @@ export function JurisprudenciaView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ texto: ementa, contexto }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro ao explicar decisão");
       setExplicacao((prev) => ({ ...prev, [id]: data }));
       toast.success("Decisão explicada pela IA");
     } catch {

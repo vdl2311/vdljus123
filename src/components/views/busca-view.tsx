@@ -58,8 +58,12 @@ export function BuscaView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: pergunta, processos }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro ao realizar busca");
       setResultado(data);
     } catch {
       toast.error("Erro na busca. Tente novamente.");

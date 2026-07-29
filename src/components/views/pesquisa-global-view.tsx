@@ -84,8 +84,12 @@ export function PesquisaGlobalView() {
           tarefas,
         }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro na pesquisa global");
       setResultados(data.resultados || []);
       setResumo(data.resumo || "");
       setSugestaoIA(data.sugestaoIA || "");

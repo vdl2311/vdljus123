@@ -83,8 +83,12 @@ export function CopilotoProativoView() {
           insightsExistentes: insights,
         }),
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+      if (!res.ok || !data) throw new Error(data?.error || "Erro no copiloto proativo");
       if (data.insights && data.insights.length > 0) {
         const novosFormatados: InsightProativo[] = data.insights.map((i: any, idx: number) => ({
           ...i,
