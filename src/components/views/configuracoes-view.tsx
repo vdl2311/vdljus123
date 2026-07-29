@@ -102,7 +102,7 @@ export function ConfiguracoesView() {
               <div className="space-y-1">
                 <p className="font-semibold">{user?.displayName || currentUser.nome}</p>
                 <p className="text-xs text-muted-foreground">{user?.email || currentUser.email}</p>
-                <Badge variant="outline" className="text-[10px] mt-1">
+                <Badge variant="outline" className="text-xs mt-1">
                   {user ? `Autenticado via Firebase (${user.providerData?.[0]?.providerId || 'Auth'})` : 'Sessão Local'}
                 </Badge>
               </div>
@@ -407,19 +407,19 @@ export function ConfiguracoesView() {
             <Separator />
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Processos</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Processos</p>
                 <p className="font-medium">Ilimitados</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Usuários</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Usuários</p>
                 <p className="font-medium">8 incluídos</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">IA Copiloto</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">IA Copiloto</p>
                 <p className="font-medium">Ilimitado</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">DataJud</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">DataJud</p>
                 <p className="font-medium">Sincronização 1h</p>
               </div>
             </div>

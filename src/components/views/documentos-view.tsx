@@ -128,7 +128,7 @@ export function DocumentosView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{d.nome}</p>
-                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                       <span>{d.tipo}</span>
                       <span>·</span>
                       <span>{d.tamanho}</span>
@@ -139,7 +139,7 @@ export function DocumentosView() {
                       <Badge
                         variant="outline"
                         className={cn(
-                          "text-[9px]",
+                          "text-xs",
                           d.statusIa === "analisado" && "border-success/40 text-success",
                           d.statusIa === "pendente" && "border-warning/40 text-warning",
                           d.statusIa === "processando" && "border-info/40 text-info"
@@ -314,7 +314,7 @@ function MiniStat({
           <Icon className="h-4 w-4" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
           <p className="text-lg font-bold tabular-nums leading-tight">{value}</p>
         </div>
       </CardContent>
@@ -348,7 +348,7 @@ function EntityCard({
           )}
         />
         <p className="text-xs font-semibold">{title}</p>
-        <Badge variant="secondary" className="text-[9px] ml-auto">
+        <Badge variant="secondary" className="text-xs ml-auto">
           {items.length}
         </Badge>
       </div>
@@ -453,13 +453,13 @@ function AnaliseDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
               </div>
               {resultado.resumo && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Resumo</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">Resumo</p>
                   <p className="text-xs">{resultado.resumo}</p>
                 </div>
               )}
               {resultado.alertas && resultado.alertas.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Alertas</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">Alertas</p>
                   <ul className="text-xs space-y-0.5">
                     {resultado.alertas.map((a: string, i: number) => (
                       <li key={i}>· {a}</li>
@@ -469,7 +469,7 @@ function AnaliseDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
               )}
               {resultado.proximosPassos && resultado.proximosPassos.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Próximos passos</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">Próximos passos</p>
                   <ul className="text-xs space-y-0.5">
                     {resultado.proximosPassos.map((a: string, i: number) => (
                       <li key={i}>→ {a}</li>

@@ -228,7 +228,7 @@ function ChatTab() {
                   )}
                   {!m.pending && m.sugestoes && m.sugestoes.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                         Perguntas sugeridas
                       </p>
                       {m.sugestoes.map((s, i) => (
@@ -276,7 +276,7 @@ function ChatTab() {
             <Send className="h-4 w-4" />
           </Button>
         </form>
-        <p className="text-[10px] text-muted-foreground/70 mt-1.5 text-center">
+        <p className="text-xs text-muted-foreground/70 mt-1.5 text-center">
           Enter para enviar · Shift+Enter para nova linha · O Copiloto pode errar — valide sempre
         </p>
       </div>
@@ -369,7 +369,7 @@ function PecaTab() {
                   <button
                     key={t}
                     onClick={() => setTipo(t)}
-                    className="text-[10px] px-2 py-1 rounded-md border border-border hover:bg-accent"
+                    className="text-xs px-2 py-1 rounded-md border border-border hover:bg-accent"
                   >
                     {t}
                   </button>

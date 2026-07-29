@@ -43,6 +43,12 @@ import type { Tarefa, TarefaPrioridade, TarefaStatus, TarefaCategoria } from "@/
 import { format, differenceInDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -140,7 +146,7 @@ export function TarefasView() {
                 <span className={cn("h-2 w-2 rounded-full", col.color)} />
                 <h3 className="text-sm font-semibold">{col.titulo}</h3>
               </div>
-              <Badge variant="secondary" className="text-[10px] tabular-nums">
+              <Badge variant="secondary" className="text-xs tabular-nums">
                 {col.tarefas.length}
               </Badge>
             </div>
@@ -163,8 +169,10 @@ export function TarefasView() {
                       toast.success("Status atualizado");
                     }}
                     onDelete={() => {
-                      removeTarefa(t.id);
-                      toast.success("Tarefa removida");
+                      if (window.confirm("Tem certeza que deseja remover esta tarefa?")) {
+                        removeTarefa(t.id);
+                        toast.success("Tarefa removida");
+                      }
                     }}
                   />
                 ))}
@@ -214,7 +222,7 @@ function TarefaCard({
             <Badge
               variant="outline"
               className={cn(
-                "text-[9px]",
+                "text-xs",
                 tarefa.prioridade === "Urgente" && "border-destructive/40 text-destructive",
                 tarefa.prioridade === "Alta" && "border-warning/40 text-warning",
                 tarefa.prioridade === "Média" && "border-info/40 text-info",
@@ -257,7 +265,7 @@ function TarefaCard({
           </div>
 
           {tarefa.processoNumeroCnj && (
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-1.5 font-mono">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5 font-mono">
               <Briefcase className="h-3 w-3" />
               {tarefa.processoNumeroCnj.slice(0, 16)}...
             </div>
@@ -322,7 +330,33 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
             <Label>Data limite</Label>
-            <Input type="date" value={dataLimite} onChange={(e) => setDataLimite(e.target.value)} />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dataLimite && "text-muted-foreground"
+                  )}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {dataLimite ? format(parseISO(dataLimite), "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={dataLimite ? parseISO(dataLimite) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      setDataLimite(date.toISOString().split("T")[0]);
+                    } else {
+                      setDataLimite("");
+                    }
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="grid gap-2">
             <Label>Prioridade</Label>

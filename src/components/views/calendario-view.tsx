@@ -130,7 +130,7 @@ export function CalendarioView() {
               <button
                 onClick={() => setFiltroTipo("todos")}
                 className={cn(
-                  "text-[10px] px-2 py-0.5 rounded border",
+                  "text-xs px-2 py-0.5 rounded border",
                   filtroTipo === "todos" ? "bg-primary/10 text-primary border-primary/30" : "border-border"
                 )}
               >
@@ -141,7 +141,7 @@ export function CalendarioView() {
                   key={key}
                   onClick={() => setFiltroTipo(key)}
                   className={cn(
-                    "text-[10px] px-2 py-0.5 rounded border flex items-center gap-1",
+                    "text-xs px-2 py-0.5 rounded border flex items-center gap-1",
                     filtroTipo === key ? "bg-primary/10 text-primary border-primary/30" : "border-border"
                   )}
                 >
@@ -154,7 +154,7 @@ export function CalendarioView() {
             {/* Cabeçalho dias da semana */}
             <div className="grid grid-cols-7 gap-1 mb-1">
               {weekDays.map((d) => (
-                <div key={d} className="text-center text-[10px] uppercase tracking-widest text-muted-foreground font-semibold py-1">
+                <div key={d} className="text-center text-xs uppercase tracking-widest text-muted-foreground font-semibold py-1">
                   {d}
                 </div>
               ))}
@@ -205,7 +205,7 @@ export function CalendarioView() {
                           );
                         })}
                         {dayEvents.length > 3 && (
-                          <span className="text-[9px] text-muted-foreground">+{dayEvents.length - 3}</span>
+                          <span className="text-xs text-muted-foreground">+{dayEvents.length - 3}</span>
                         )}
                       </div>
                     )}
@@ -252,7 +252,7 @@ export function CalendarioView() {
                           {e.clienteNome && (
                             <p className="text-xs text-muted-foreground mt-0.5">{e.clienteNome}</p>
                           )}
-                          <Badge variant="outline" className="mt-1 text-[9px]">
+                          <Badge variant="outline" className="mt-1 text-xs">
                             <cfg.icon className="h-2.5 w-2.5 mr-0.5" />
                             {cfg.label}
                           </Badge>
@@ -282,15 +282,15 @@ export function CalendarioView() {
                       className="w-full flex gap-3 p-3 hover:bg-accent/40 transition-colors text-left"
                     >
                       <div className="flex flex-col items-center justify-center min-w-[44px] py-1 rounded-md bg-muted/40">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground">
                           {format(date, "MMM", { locale: ptBR })}
                         </span>
                         <span className="text-base font-bold leading-none">{format(date, "dd")}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium leading-tight">{e.titulo}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{e.hora} · {e.clienteNome || "—"}</p>
-                        <Badge variant="outline" className="mt-1 text-[9px]">
+                        <p className="text-xs text-muted-foreground mt-0.5">{e.hora} · {e.clienteNome || "—"}</p>
+                        <Badge variant="outline" className="mt-1 text-xs">
                           <cfg.icon className="h-2.5 w-2.5 mr-0.5" />
                           {cfg.label}
                         </Badge>
@@ -333,7 +333,7 @@ function StatCard({
           <Icon className="h-4 w-4" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
           <p className="text-lg font-bold tabular-nums leading-tight">{value}</p>
         </div>
       </CardContent>

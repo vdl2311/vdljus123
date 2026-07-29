@@ -48,7 +48,7 @@ export function MapaProcessosView() {
               <FolderKanban className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total Processos</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Total Processos</p>
               <p className="text-lg font-bold tabular-nums">{totalProcessos}</p>
             </div>
           </CardContent>
@@ -59,7 +59,7 @@ export function MapaProcessosView() {
               <TrendingUp className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Ativos</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Ativos</p>
               <p className="text-lg font-bold tabular-nums text-success">{totalAtivos}</p>
             </div>
           </CardContent>
@@ -70,7 +70,7 @@ export function MapaProcessosView() {
               <MapPin className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Estados</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Estados</p>
               <p className="text-lg font-bold tabular-nums">{processosPorEstado.length}</p>
             </div>
           </CardContent>
@@ -81,7 +81,7 @@ export function MapaProcessosView() {
               <DollarSign className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Valor Total</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Valor Total</p>
               <p className="text-lg font-bold tabular-nums">{formatCurrency(totalValor).replace("R$", "").trim()}k</p>
             </div>
           </CardContent>
@@ -175,7 +175,7 @@ export function MapaProcessosView() {
               </svg>
 
               {/* Legenda */}
-              <div className="absolute bottom-3 left-3 rounded-lg bg-card/80 backdrop-blur p-2 text-[10px] space-y-1">
+              <div className="absolute bottom-3 left-3 rounded-lg bg-card/80 backdrop-blur p-2 text-xs space-y-1">
                 <p className="font-semibold uppercase tracking-widest text-muted-foreground">Legenda</p>
                 <div className="flex items-center gap-1.5">
                   <span className="h-3 w-3 rounded-full bg-primary/40 border border-primary" />
@@ -205,27 +205,27 @@ export function MapaProcessosView() {
               <div>
                 <div className="grid grid-cols-3 gap-2 p-4 border-b">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total</p>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Total</p>
                     <p className="text-lg font-bold tabular-nums">{estadoDetalhe.total}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Ativos</p>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Ativos</p>
                     <p className="text-lg font-bold tabular-nums text-primary">{estadoDetalhe.ativos}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Valor</p>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Valor</p>
                     <p className="text-lg font-bold tabular-nums">{formatCurrency(estadoDetalhe.valorTotal).replace("R$", "").trim()}</p>
                   </div>
                 </div>
                 <div className="divide-y">
                   {estadoDetalhe.comarcas.map((c) => (
                     <div key={c.nome} className="p-3 flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">
                         {c.nome.slice(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium">{c.nome}</p>
-                        <p className="text-[10px] text-muted-foreground">{c.total} processo(s)</p>
+                        <p className="text-xs text-muted-foreground">{c.total} processo(s)</p>
                       </div>
                       <div className="w-20">
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -283,7 +283,7 @@ export function MapaProcessosView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{e.estado}</p>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       {e.ativos} ativos · {formatCurrency(e.valorTotal).replace("R$", "").trim()} · {e.comarcas.length} comarca(s)
                     </p>
                   </div>

@@ -375,7 +375,7 @@ export function DashboardView() {
                         {diasPrazo !== null && (
                           <Badge
                             variant={diasPrazo <= 7 ? "destructive" : "secondary"}
-                            className="shrink-0 text-[10px]"
+                            className="shrink-0 text-xs"
                           >
                             <Clock className="h-3 w-3 mr-0.5" />
                             {diasPrazo}d
@@ -383,7 +383,7 @@ export function DashboardView() {
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-1.5">
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           {p.area}
                         </Badge>
                         <span className="text-[11px] text-muted-foreground truncate">
@@ -422,7 +422,7 @@ export function DashboardView() {
                   return (
                     <div key={e.id} className="flex gap-3 p-3 hover:bg-accent/40 transition-colors">
                       <div className="flex flex-col items-center justify-center min-w-[44px] py-1">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground">
                           {format(date, "MMM", { locale: ptBR })}
                         </span>
                         <span className="text-lg font-bold leading-none">
@@ -436,7 +436,7 @@ export function DashboardView() {
                         </p>
                         <Badge
                           variant={isHoje ? "destructive" : isAmanha ? "default" : "outline"}
-                          className="mt-1 text-[10px]"
+                          className="mt-1 text-xs"
                         >
                           {isHoje ? "Hoje" : isAmanha ? "Amanhã" : format(date, "EEE", { locale: ptBR })}
                         </Badge>
@@ -528,12 +528,12 @@ export function DashboardView() {
                         <p className="text-sm font-medium leading-tight line-clamp-1">{i.titulo}</p>
                         <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{i.descricao}</p>
                         <div className="flex items-center gap-1.5 mt-1.5">
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-xs">
                             {i.tipo}
                           </Badge>
                           <Badge
                             variant={i.classificacaoIa === "Ação Necessária" ? "destructive" : "secondary"}
-                            className="text-[10px]"
+                            className="text-xs"
                           >
                             <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                             {i.classificacaoIa}
@@ -593,14 +593,14 @@ export function DashboardView() {
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <div>
                   <p className="text-xs font-medium">{escritorioStats.taxaSucesso}%</p>
-                  <p className="text-[10px] text-muted-foreground">Taxa de êxito</p>
+                  <p className="text-xs text-muted-foreground">Taxa de êxito</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-primary" />
                 <div>
                   <p className="text-xs font-medium">181</p>
-                  <p className="text-[10px] text-muted-foreground">Ações automáticas / mês</p>
+                  <p className="text-xs text-muted-foreground">Ações automáticas / mês</p>
                 </div>
               </div>
             </div>

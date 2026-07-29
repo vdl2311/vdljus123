@@ -121,19 +121,19 @@ export function ProcessoDetalheView() {
           <div className="flex flex-col md:flex-row md:items-start gap-4 justify-between">
             <div className="space-y-2 min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="font-mono text-[10px]">
+                <Badge variant="outline" className="font-mono text-xs">
                   {processo.numeroCnj}
                 </Badge>
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge variant="secondary" className="text-xs">
                   {processo.tribunal} · {processo.comarca}
                 </Badge>
-                <Badge variant="outline" className="text-[10px]">
+                <Badge variant="outline" className="text-xs">
                   {processo.status}
                 </Badge>
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-[10px]",
+                    "text-xs",
                     processo.risco === "Alto" && "border-destructive/40 text-destructive",
                     processo.risco === "Médio" && "border-warning/40 text-warning",
                     processo.risco === "Baixo" && "border-success/40 text-success"
@@ -150,7 +150,7 @@ export function ProcessoDetalheView() {
               </p>
               <div className="flex items-center gap-1.5 flex-wrap pt-1">
                 {processo.tags.map((t) => (
-                  <Badge key={t} variant="secondary" className="text-[10px] gap-0.5">
+                  <Badge key={t} variant="secondary" className="text-xs gap-0.5">
                     <Tag className="h-2.5 w-2.5" />
                     {t}
                   </Badge>
@@ -169,7 +169,7 @@ export function ProcessoDetalheView() {
                   {processo.probabilidadeSucesso}%
                 </p>
                 <Progress value={processo.probabilidadeSucesso} className="h-1.5 mt-2" />
-                <p className="text-[10px] text-muted-foreground mt-1.5">
+                <p className="text-xs text-muted-foreground mt-1.5">
                   Análise IA baseada em {processo.movimentacoes.length} movimentações
                 </p>
               </div>
@@ -190,7 +190,7 @@ export function ProcessoDetalheView() {
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-xs font-semibold">Resumo do Copiloto IA</span>
-                    <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20">
+                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
                       Auto-gerado
                     </Badge>
                   </div>
@@ -262,13 +262,13 @@ export function ProcessoDetalheView() {
                           <span className="text-xs font-semibold tabular-nums">
                             {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                           </span>
-                          <Badge variant="outline" className="text-[9px]">
+                          <Badge variant="outline" className="text-xs">
                             {m.fonte}
                           </Badge>
                           <Badge
                             variant="outline"
                             className={cn(
-                              "text-[9px]",
+                              "text-xs",
                               m.relevancia === "Alta" && "border-destructive/40 text-destructive",
                               m.relevancia === "Média" && "border-warning/40 text-warning"
                             )}
@@ -276,7 +276,7 @@ export function ProcessoDetalheView() {
                             {m.relevancia}
                           </Badge>
                           {isLatest && (
-                            <Badge className="text-[9px] bg-primary text-primary-foreground">
+                            <Badge className="text-xs bg-primary text-primary-foreground">
                               Mais recente
                             </Badge>
                           )}
@@ -346,21 +346,21 @@ export function ProcessoDetalheView() {
             </CardHeader>
             <CardContent className="space-y-3 pt-0">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
                   Polo ativo
                 </p>
                 <p className="text-sm font-medium">{processo.partes.poloAtivo}</p>
               </div>
               <Separator />
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
                   Polo passivo
                 </p>
                 <p className="text-sm font-medium">{processo.partes.poloPassivo}</p>
               </div>
               <Separator />
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
                   Advogado responsável
                 </p>
                 <p className="text-sm font-medium">{processo.advogadoResponsavelNome}</p>
@@ -428,7 +428,7 @@ function DateRow({
   return (
     <div className="flex items-start justify-between gap-2">
       <div>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
         <p className="text-sm font-medium">
           {format(parseISO(value), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </p>
@@ -436,7 +436,7 @@ function DateRow({
       {countdown !== null && countdown !== undefined && (
         <Badge
           variant={highlight === "destructive" ? "destructive" : "secondary"}
-          className="text-[10px]"
+          className="text-xs"
         >
           <Clock className="h-3 w-3 mr-0.5" />
           {countdown < 0 ? `${Math.abs(countdown)}d em atraso` : `${countdown}d`}
@@ -464,7 +464,7 @@ function DocumentoRow({ documentoId }: { documentoId: string; key?: string }) {
           {doc.tipo} · {doc.tamanho} · {format(new Date(doc.dataUpload), "dd/MM/yyyy")}
         </p>
       </div>
-      <Badge variant="outline" className="text-[10px]">
+      <Badge variant="outline" className="text-xs">
         {doc.statusIa === "analisado" ? (
           <>
             <CheckCircle2 className="h-3 w-3 mr-0.5" />

@@ -184,15 +184,15 @@ export function CopilotoProativoView() {
             <div className="grid grid-cols-3 gap-3 shrink-0">
               <div className="rounded-xl bg-card/80 border border-destructive/20 p-3 text-center min-w-[80px]">
                 <p className="text-2xl font-bold text-destructive tabular-nums">{criticasCount}</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Críticas</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Críticas</p>
               </div>
               <div className="rounded-xl bg-card/80 border border-warning/20 p-3 text-center min-w-[80px]">
                 <p className="text-2xl font-bold text-warning tabular-nums">{altasCount}</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Altas</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Altas</p>
               </div>
               <div className="rounded-xl bg-card/80 border border-primary/20 p-3 text-center min-w-[80px]">
                 <p className="text-lg font-bold text-primary tabular-nums">{formatCurrency(impactoTotal).replace("R$", "").trim()}</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Impacto R$</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Impacto R$</p>
               </div>
             </div>
           </div>
@@ -248,7 +248,7 @@ export function CopilotoProativoView() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold">{cfg.label}</h3>
-                  <p className="text-[10px] text-muted-foreground">{items.length} insight(s)</p>
+                  <p className="text-xs text-muted-foreground">{items.length} insight(s)</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -312,16 +312,16 @@ function InsightCard({
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
               <span className={cn("h-2 w-2 rounded-full", sev.bg.replace("/10", "").replace("/15", ""))} />
-              <Badge variant="outline" className={cn("text-[9px]", sev.color, sev.border)}>
+              <Badge variant="outline" className={cn("text-xs", sev.color, sev.border)}>
                 {sev.label}
               </Badge>
               {isNew && (
-                <Badge className="text-[9px] bg-primary text-primary-foreground">
+                <Badge className="text-xs bg-primary text-primary-foreground">
                   <Sparkles className="h-2.5 w-2.5 mr-0.5" /> Novo
                 </Badge>
               )}
               {insight.prazoDias !== undefined && (
-                <Badge variant="outline" className="text-[9px]">
+                <Badge variant="outline" className="text-xs">
                   <Clock className="h-2.5 w-2.5 mr-0.5" />
                   {insight.prazoDias}d
                 </Badge>
@@ -333,7 +333,7 @@ function InsightCard({
           <p className="text-xs text-muted-foreground leading-relaxed mb-3">{insight.descricao}</p>
 
           {(insight.clienteNome || insight.processoNumeroCnj) && (
-            <div className="flex items-center gap-2 mb-2 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
               {insight.clienteNome && <span>👤 {insight.clienteNome}</span>}
               {insight.processoNumeroCnj && (
                 <span className="font-mono">📋 {insight.processoNumeroCnj.slice(0, 16)}...</span>
@@ -346,7 +346,7 @@ function InsightCard({
             <div className="flex items-start gap-1.5">
               <Zap className={cn("h-3 w-3 shrink-0 mt-0.5", sev.color)} />
               <div>
-                <p className={cn("text-[10px] uppercase tracking-widest font-semibold mb-0.5", sev.color)}>
+                <p className={cn("text-xs uppercase tracking-widest font-semibold mb-0.5", sev.color)}>
                   Ação sugerida
                 </p>
                 <p className="text-xs leading-snug">{insight.acaoSugerida}</p>

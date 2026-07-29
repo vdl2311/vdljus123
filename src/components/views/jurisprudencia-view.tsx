@@ -142,9 +142,9 @@ export function JurisprudenciaView() {
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div>
                         <p className="text-xs font-semibold">{t.area}</p>
-                        <p className="text-[10px] text-muted-foreground">{t.tribunal}</p>
+                        <p className="text-xs text-muted-foreground">{t.tribunal}</p>
                       </div>
-                      <Badge variant="outline" className={cn("text-[9px]", cfg.color, cfg.bg, "border-current/30")}>
+                      <Badge variant="outline" className={cn("text-xs", cfg.color, cfg.bg, "border-current/30")}>
                         <cfg.icon className="h-2.5 w-2.5 mr-0.5" />
                         {cfg.label}
                       </Badge>
@@ -161,7 +161,7 @@ export function JurisprudenciaView() {
                           className={cn("h-2", t.tendencia === "Favorável" && "[&>div]:bg-success", t.tendencia === "Contrária" && "[&>div]:bg-destructive")}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>{t.totalDecisoes} decisões analisadas</span>
                         <span className={cn("flex items-center gap-0.5 font-medium", t.variacaoMes >= 0 ? "text-success" : "text-destructive")}>
                           {t.variacaoMes >= 0 ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
@@ -169,7 +169,7 @@ export function JurisprudenciaView() {
                         </span>
                       </div>
                       <div className="pt-2 border-t">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Tese predominante</p>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">Tese predominante</p>
                         <p className="text-xs leading-snug">{t.tesePredominante}</p>
                       </div>
                     </div>
@@ -233,7 +233,7 @@ export function JurisprudenciaView() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="text-sm font-semibold leading-tight">{j.tribunal} · {j.classe}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                          <p className="text-xs text-muted-foreground mt-0.5">
                             Relator: {j.relator} · Julgado em {format(parseISO(j.dataJulgamento), "dd/MM/yyyy", { locale: ptBR })}
                           </p>
                         </div>
@@ -241,33 +241,33 @@ export function JurisprudenciaView() {
                           <Badge
                             variant="outline"
                             className={cn(
-                              "text-[9px]",
+                              "text-xs",
                               j.relevanceScore >= 90 && "border-success/40 text-success",
                               j.relevanceScore >= 75 && j.relevanceScore < 90 && "border-primary/40 text-primary"
                             )}
                           >
                             {j.relevanceScore}% relev.
                           </Badge>
-                          <Badge variant="outline" className="text-[9px]">{j.area}</Badge>
+                          <Badge variant="outline" className="text-xs">{j.area}</Badge>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="rounded-lg bg-muted/40 p-3 mb-3">
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Tese firmada</p>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Tese firmada</p>
                     <p className="text-sm font-medium leading-snug">{j.tese}</p>
                   </div>
 
                   <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{j.ementa}</p>
 
                   <div className="flex items-center gap-1.5 mt-3">
-                    <Badge variant="outline" className="text-[9px] font-mono">
+                    <Badge variant="outline" className="text-xs font-mono">
                       {j.processoOrigem}
                     </Badge>
                     <Badge
                       variant="outline"
-                      className={cn("text-[9px]", j.favoravel ? "border-success/40 text-success" : "border-destructive/40 text-destructive")}
+                      className={cn("text-xs", j.favoravel ? "border-success/40 text-success" : "border-destructive/40 text-destructive")}
                     >
                       {j.favoravel ? "Favorável" : "Contrária"}
                     </Badge>
@@ -283,13 +283,13 @@ export function JurisprudenciaView() {
                       <div className="flex items-start gap-2 mb-2">
                         <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <p className="text-[10px] uppercase tracking-widest text-primary font-semibold mb-1">Explicação em linguagem simples</p>
+                          <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Explicação em linguagem simples</p>
                           <p className="text-sm leading-relaxed">{temExplicacao.explicacaoSimples}</p>
                         </div>
                       </div>
                       {temExplicacao.pontosChave && temExplicacao.pontosChave.length > 0 && (
                         <div className="mt-2">
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Pontos-chave</p>
+                          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Pontos-chave</p>
                           <ul className="text-xs space-y-0.5">
                             {temExplicacao.pontosChave.map((p: string, i: number) => (
                               <li key={i} className="flex gap-1">
@@ -301,7 +301,7 @@ export function JurisprudenciaView() {
                       )}
                       {temExplicacao.impacto && (
                         <div className="mt-2 pt-2 border-t border-primary/20">
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Impacto prático</p>
+                          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">Impacto prático</p>
                           <p className="text-xs">{temExplicacao.impacto}</p>
                         </div>
                       )}

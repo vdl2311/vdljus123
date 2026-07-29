@@ -190,7 +190,7 @@ function ClienteCard({
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-[10px] shrink-0",
+                    "text-xs shrink-0",
                     cliente.status === "Ativo" && "border-success/40 text-success",
                     cliente.status === "Potencial" && "border-info/40 text-info",
                     cliente.status === "Inativo" && "border-muted-foreground/40"
@@ -227,13 +227,13 @@ function ClienteCard({
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2 pt-3 border-t">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">
                 Processos
               </p>
               <p className="text-base font-bold tabular-nums">{totalProcessos}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">
                 Ativos
               </p>
               <p className="text-base font-bold tabular-nums text-primary">
@@ -241,7 +241,7 @@ function ClienteCard({
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">
                 Desde
               </p>
               <p className="text-base font-bold tabular-nums">
@@ -260,7 +260,7 @@ function ClienteCard({
           {/* Processos vinculados */}
           {clienteProcessos.length > 0 && (
             <div className="mt-3 pt-3 border-t space-y-1">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
                 Processos vinculados
               </p>
               {clienteProcessos.slice(0, 2).map((p) => (

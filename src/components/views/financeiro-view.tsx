@@ -322,27 +322,27 @@ export function FinanceiroView() {
                             {isReceita ? "+" : "−"} {formatCurrency(l.valor)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
-                          <Badge variant="outline" className="text-[9px]">{l.tipo}</Badge>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                          <Badge variant="outline" className="text-xs">{l.tipo}</Badge>
                           <span>{l.categoria}</span>
                           {l.clienteNome && <span>· {l.clienteNome}</span>}
                         </div>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Calendar className="h-2.5 w-2.5" />
                             {format(date, "dd/MM/yyyy")}
                           </span>
-                          <Badge variant="outline" className={cn("text-[9px]", stCfg.bg, stCfg.color, "border-current/30")}>
+                          <Badge variant="outline" className={cn("text-xs", stCfg.bg, stCfg.color, "border-current/30")}>
                             {l.status === "Pago" && <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />}
                             {l.status === "Pendente" && <Clock className="h-2.5 w-2.5 mr-0.5" />}
                             {l.status === "Atrasado" && <AlertCircle className="h-2.5 w-2.5 mr-0.5" />}
                             {l.status} {l.status === "Pendente" && dias < 0 && `(${Math.abs(dias)}d)`}
                           </Badge>
                           {l.formaPagamento && (
-                            <Badge variant="outline" className="text-[9px]">{l.formaPagamento}</Badge>
+                            <Badge variant="outline" className="text-xs">{l.formaPagamento}</Badge>
                           )}
                           {l.recorrente && (
-                            <Badge variant="outline" className="text-[9px]">Recorrente</Badge>
+                            <Badge variant="outline" className="text-xs">Recorrente</Badge>
                           )}
                         </div>
                       </div>
@@ -372,7 +372,7 @@ export function FinanceiroView() {
                     <Badge
                       variant="outline"
                       className={cn(
-                        "text-[9px] shrink-0",
+                        "text-xs shrink-0",
                         c.status === "Ativo" && "border-success/40 text-success"
                       )}
                     >
@@ -380,25 +380,25 @@ export function FinanceiroView() {
                     </Badge>
                   </div>
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Badge variant="secondary" className="text-[9px]">{c.tipo}</Badge>
+                    <Badge variant="secondary" className="text-xs">{c.tipo}</Badge>
                     {c.percentualSucesso && (
-                      <Badge variant="outline" className="text-[9px]">{c.percentualSucesso}% sucesso</Badge>
+                      <Badge variant="outline" className="text-xs">{c.percentualSucesso}% sucesso</Badge>
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Valor base</p>
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground">Valor base</p>
                       <p className="font-medium tabular-nums">{formatCurrency(c.valorBase)}</p>
                     </div>
                     {c.valorProximaParcela && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Próx. parcela</p>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Próx. parcela</p>
                         <p className="font-medium tabular-nums text-primary">{formatCurrency(c.valorProximaParcela)}</p>
                       </div>
                     )}
                   </div>
                   {c.proximoVencimento && (
-                    <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                       <Calendar className="h-2.5 w-2.5" />
                       Venc: {format(parseISO(c.proximoVencimento), "dd/MM/yyyy")}
                     </div>

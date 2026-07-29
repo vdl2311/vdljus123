@@ -172,7 +172,7 @@ export function AppHeader() {
         >
           <Search className="h-4 w-4" />
           <span className="flex-1 text-left">Buscar ou pedir à IA...</span>
-          <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-background text-[10px] font-mono">
+          <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-background text-xs font-mono">
             <CommandIcon className="h-3 w-3" />K
           </kbd>
         </button>
@@ -215,7 +215,7 @@ export function AppHeader() {
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm">Notificações</span>
                 {naoLidas > 0 && (
-                  <Badge variant="secondary" className="text-[10px]">
+                  <Badge variant="secondary" className="text-xs">
                     {naoLidas} novas
                   </Badge>
                 )}
@@ -264,7 +264,7 @@ export function AppHeader() {
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                           {n.descricao}
                         </p>
-                        <p className="text-[10px] text-muted-foreground/70 mt-1.5">
+                        <p className="text-xs text-muted-foreground/70 mt-1.5">
                           {formatDistanceToNow(new Date(n.dataHora), {
                             addSuffix: true,
                             locale: ptBR,
@@ -310,7 +310,7 @@ export function AppHeader() {
               </div>
               <div className="hidden lg:block text-left leading-tight">
                 <p className="text-xs font-medium">{displayName}</p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {currentUser.oab}
                 </p>
               </div>

@@ -243,7 +243,7 @@ export function PesquisaGlobalView() {
                       <cfg.icon className="h-3.5 w-3.5" />
                     </div>
                     <h3 className="text-sm font-semibold">{cfg.label}</h3>
-                    <Badge variant="secondary" className="text-[10px]">{items.length}</Badge>
+                    <Badge variant="secondary" className="text-xs">{items.length}</Badge>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {items.map((r, idx) => (
@@ -265,7 +265,7 @@ export function PesquisaGlobalView() {
                               <Badge
                                 variant="outline"
                                 className={cn(
-                                  "text-[9px] shrink-0",
+                                  "text-xs shrink-0",
                                   r.score >= 90 && "border-success/40 text-success",
                                   r.score >= 70 && r.score < 90 && "border-primary/40 text-primary",
                                   r.score < 70 && "border-muted-foreground/40"
@@ -276,7 +276,7 @@ export function PesquisaGlobalView() {
                             </div>
                             <p className="text-xs text-muted-foreground line-clamp-2">{r.descricao}</p>
                             {r.meta && (
-                              <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">{r.meta}</p>
+                              <p className="text-xs text-muted-foreground mt-1.5 font-mono">{r.meta}</p>
                             )}
                           </CardContent>
                         </Card>

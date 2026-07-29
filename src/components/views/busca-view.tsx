@@ -177,7 +177,7 @@ export function BuscaView() {
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">{resultado.resumo}</p>
                     <p className="text-xs text-muted-foreground">{resultado.explicacao}</p>
-                    <Badge variant="secondary" className="mt-2 text-[10px]">
+                    <Badge variant="secondary" className="mt-2 text-xs">
                       {processosEncontrados.length} processo(s) encontrado(s)
                     </Badge>
                   </div>
@@ -222,7 +222,7 @@ export function BuscaView() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0">
-                                <p className="font-mono text-[10px] text-muted-foreground">
+                                <p className="font-mono text-xs text-muted-foreground">
                                   {p.numeroCnj}
                                 </p>
                                 <p className="text-sm font-semibold truncate">
@@ -232,19 +232,19 @@ export function BuscaView() {
                               <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                             </div>
                             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                              <Badge variant="outline" className="text-[10px]">
+                              <Badge variant="outline" className="text-xs">
                                 {p.area}
                               </Badge>
-                              <Badge variant="outline" className="text-[10px]">
+                              <Badge variant="outline" className="text-xs">
                                 {p.tribunal}
                               </Badge>
-                              <Badge variant="outline" className="text-[10px]">
+                              <Badge variant="outline" className="text-xs">
                                 {formatCurrency(p.valorCausa)}
                               </Badge>
                               {diasPrazo !== null && (
                                 <Badge
                                   variant={diasPrazo <= 7 ? "destructive" : "secondary"}
-                                  className="text-[10px]"
+                                  className="text-xs"
                                 >
                                   Prazo: {diasPrazo}d
                                 </Badge>

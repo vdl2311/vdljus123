@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export function PortalClienteView() {
-  const { processos, setView } = useAppStore();
+  const { processos, setView, user } = useAppStore();
 
   // Simula login como cliente "Construtora Horizonte"
   const clienteId = "c-001";
@@ -75,7 +75,7 @@ export function PortalClienteView() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">
                   Bem-vindo(a)
                 </p>
                 <h2 className="text-xl md:text-2xl font-bold leading-tight">{clienteNome}</h2>
@@ -87,15 +87,15 @@ export function PortalClienteView() {
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center">
                 <p className="text-2xl font-bold tabular-nums">{processosCliente.length}</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Processos</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">Processos</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold tabular-nums text-primary">{ativos.length}</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Ativos</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">Ativos</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold tabular-nums">2</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Prazos 30d</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">Prazos 30d</p>
               </div>
             </div>
           </div>
@@ -113,9 +113,9 @@ export function PortalClienteView() {
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-1.5 mb-1">
-                <p className="text-sm font-semibold">Dra. Marina Vidal</p>
-                <Badge variant="outline" className="text-[9px]">Sócia responsável</Badge>
-                <span className="text-[10px] text-muted-foreground ml-auto">há 2 horas</span>
+                <p className="text-sm font-semibold">{user?.displayName || "Advogado(a) Responsável"}</p>
+                <Badge variant="outline" className="text-xs">Sócia responsável</Badge>
+                <span className="text-xs text-muted-foreground ml-auto">há 2 horas</span>
               </div>
               <p className="text-sm leading-relaxed">
                 Olá! Recebemos os cartões de ponto eletrônicos e já estamos analisando.
@@ -156,13 +156,13 @@ export function PortalClienteView() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="min-w-0">
-                        <p className="font-mono text-[10px] text-muted-foreground">{p.numeroCnj}</p>
+                        <p className="font-mono text-xs text-muted-foreground">{p.numeroCnj}</p>
                         <p className="text-sm font-semibold mt-0.5">{p.assunto}</p>
                       </div>
                       <Badge
                         variant="outline"
                         className={cn(
-                          "text-[9px] shrink-0",
+                          "text-xs shrink-0",
                           p.status === "Ativo" && "border-success/40 text-success",
                           p.status === "Em Recurso" && "border-warning/40 text-warning"
                         )}
@@ -171,7 +171,7 @@ export function PortalClienteView() {
                       </Badge>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-[10px] mb-3">
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
                       <div>
                         <span className="text-muted-foreground">Tribunal: </span>
                         <strong>{p.tribunal}</strong>
@@ -184,7 +184,7 @@ export function PortalClienteView() {
 
                     {ultimaMov && (
                       <div className="rounded-md bg-muted/40 p-2 text-xs">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5">
                           Última movimentação · {format(parseISO(ultimaMov.data), "dd/MM/yyyy")}
                         </p>
                         <p className="line-clamp-2">{ultimaMov.descricao}</p>
@@ -195,14 +195,14 @@ export function PortalClienteView() {
                       {diasPrazo !== null && (
                         <Badge
                           variant={diasPrazo <= 7 ? "destructive" : "secondary"}
-                          className="text-[10px]"
+                          className="text-xs"
                         >
                           <Clock className="h-2.5 w-2.5 mr-0.5" />
                           Próximo prazo: {diasPrazo}d
                         </Badge>
                       )}
                       {p.datasImportantes.proximaAudiencia && (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           <Calendar className="h-2.5 w-2.5 mr-0.5" />
                           Audiência {format(parseISO(p.datasImportantes.proximaAudiencia), "dd/MM")}
                         </Badge>
@@ -262,7 +262,7 @@ export function PortalClienteView() {
                   <div className="flex flex-col items-center justify-center min-w-[48px] py-1 rounded-md bg-muted/40">
                     {(p.datasImportantes.proximaAudiencia || p.datasImportantes.prazoFatal) && (
                       <>
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground">
                           {format(parseISO(p.datasImportantes.proximaAudiencia || p.datasImportantes.prazoFatal!), "MMM", { locale: ptBR })}
                         </span>
                         <span className="text-base font-bold leading-none">
@@ -277,7 +277,7 @@ export function PortalClienteView() {
                     </p>
                     <p className="text-xs text-muted-foreground truncate">{p.assunto}</p>
                   </div>
-                  <Badge variant="outline" className="text-[9px]">
+                  <Badge variant="outline" className="text-xs">
                     {p.datasImportantes.proximaAudiencia ? "Audiência" : "Prazo"}
                   </Badge>
                 </div>

@@ -59,7 +59,7 @@ export function AutomacoesView() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Zap className="h-3.5 w-3.5" />
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Ativas</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Ativas</span>
             </div>
             <p className="text-2xl font-bold tabular-nums">{ativas}/{items.length}</p>
           </CardContent>
@@ -70,7 +70,7 @@ export function AutomacoesView() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success">
                 <Activity className="h-3.5 w-3.5" />
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Execuções 30d</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Execuções 30d</span>
             </div>
             <p className="text-2xl font-bold tabular-nums">{totalExecucoes}</p>
           </CardContent>
@@ -81,7 +81,7 @@ export function AutomacoesView() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-info/10 text-info">
                 <Clock className="h-3.5 w-3.5" />
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Tempo economizado</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Tempo economizado</span>
             </div>
             <p className="text-2xl font-bold tabular-nums">42h</p>
           </CardContent>
@@ -92,7 +92,7 @@ export function AutomacoesView() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-warning/15 text-warning">
                 <Sparkles className="h-3.5 w-3.5" />
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Precisão IA</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Precisão IA</span>
             </div>
             <p className="text-2xl font-bold tabular-nums">94%</p>
           </CardContent>
@@ -147,7 +147,7 @@ export function AutomacoesView() {
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div className="min-w-0">
                           <h3 className="font-semibold text-sm leading-tight">{a.nome}</h3>
-                          <Badge variant="outline" className="text-[9px] mt-0.5">
+                          <Badge variant="outline" className="text-xs mt-0.5">
                             {a.tipo}
                           </Badge>
                         </div>
@@ -158,13 +158,13 @@ export function AutomacoesView() {
 
                       <div className="space-y-2 text-xs">
                         <div className="flex items-start gap-2">
-                          <span className="text-[10px] uppercase tracking-widest text-muted-foreground min-w-[60px] mt-0.5">
+                          <span className="text-xs uppercase tracking-widest text-muted-foreground min-w-[60px] mt-0.5">
                             Gatilho
                           </span>
                           <span className="flex-1">{a.gatilho}</span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="text-[10px] uppercase tracking-widest text-muted-foreground min-w-[60px] mt-0.5">
+                          <span className="text-xs uppercase tracking-widest text-muted-foreground min-w-[60px] mt-0.5">
                             Ação
                           </span>
                           <span className="flex-1">{a.acao}</span>
@@ -172,7 +172,7 @@ export function AutomacoesView() {
                       </div>
 
                       <div className="flex items-center justify-between mt-3 pt-3 border-t">
-                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Activity className="h-3 w-3" />
                             {a.execucoesUltimos30Dias} execuções / 30d
@@ -234,7 +234,7 @@ export function AutomacoesView() {
                 className="text-left p-3 rounded-lg border border-dashed border-border hover:border-primary/40 hover:bg-accent/30 transition-all"
               >
                 <p className="text-xs font-medium">{s.nome}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
               </button>
             ))}
           </div>

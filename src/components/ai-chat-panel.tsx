@@ -156,7 +156,7 @@ export function AiChatPanel() {
               </div>
               <div>
                 <p className="text-sm font-semibold leading-tight">Copiloto Jurídico</p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {processoContexto ? "Contexto: processo selecionado" : "Assistente geral"}
                 </p>
               </div>
@@ -188,7 +188,7 @@ export function AiChatPanel() {
                     </p>
                   </div>
                   <div className="w-full space-y-2 mt-4">
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                       Sugestões
                     </p>
                     {quickPrompts.map((p) => (
@@ -248,7 +248,7 @@ export function AiChatPanel() {
                     )}
                     {!m.pending && m.sugestoes && m.sugestoes.length > 0 && (
                       <div className="mt-2.5 pt-2.5 border-t border-border/40 space-y-1.5">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                           Continue
                         </p>
                         {m.sugestoes.map((s, i) => (
@@ -300,7 +300,7 @@ export function AiChatPanel() {
                 <Send className="h-4 w-4" />
               </Button>
             </form>
-            <p className="text-[10px] text-muted-foreground/70 mt-1.5 text-center">
+            <p className="text-xs text-muted-foreground/70 mt-1.5 text-center">
               Pressione Enter para enviar · Shift+Enter para nova linha
             </p>
           </div>

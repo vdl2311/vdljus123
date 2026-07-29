@@ -88,6 +88,7 @@ export function ProcessosView() {
     openProcesso,
     addProcesso,
     updateProcesso,
+    user,
   } = useAppStore();
 
   const [showNewDialog, setShowNewDialog] = React.useState(false);
@@ -186,8 +187,8 @@ export function ProcessosView() {
         poloAtivo: datajudResult.poloAtivo,
         poloPassivo: datajudResult.poloPassivo,
       },
-      advogadoResponsavelId: "u-001",
-      advogadoResponsavelNome: "Dra. Marina Vidal",
+      advogadoResponsavelId: user?.uid || "u-001",
+      advogadoResponsavelNome: user?.displayName || "Advogado(a)",
       clienteId: "c-001",
       clienteNome: "[Vincular cliente]",
       status: "Ativo",
@@ -449,7 +450,7 @@ function ProcessoCard({
               </div>
               <div className="lg:hidden flex-1" />
               <div className="hidden lg:block">
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">
                   Risco
                 </p>
                 <p
@@ -475,13 +476,13 @@ function ProcessoCard({
                   </h3>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <Badge variant="outline" className="text-[10px]">
+                  <Badge variant="outline" className="text-xs">
                     {processo.status}
                   </Badge>
                   {diasPrazo !== null && (
                     <Badge
                       variant={diasPrazo <= 7 ? "destructive" : diasPrazo <= 15 ? "secondary" : "outline"}
-                      className="text-[10px]"
+                      className="text-xs"
                     >
                       <Clock className="h-3 w-3 mr-0.5" />
                       {diasPrazo}d
@@ -511,7 +512,7 @@ function ProcessoCard({
                       </span>
                       <span className="truncate">{m.descricao}</span>
                       {m.alertaIa && (
-                        <Badge variant="outline" className="text-[9px] shrink-0 bg-primary/5 text-primary border-primary/20">
+                        <Badge variant="outline" className="text-xs shrink-0 bg-primary/5 text-primary border-primary/20">
                           <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
                           IA
                         </Badge>
@@ -526,7 +527,7 @@ function ProcessoCard({
                 <div className="flex items-center gap-1.5 mt-3 flex-wrap">
                   <Tag className="h-3 w-3 text-muted-foreground" />
                   {processo.tags.map((t) => (
-                    <Badge key={t} variant="secondary" className="text-[10px]">
+                    <Badge key={t} variant="secondary" className="text-xs">
                       {t}
                     </Badge>
                   ))}
@@ -547,7 +548,7 @@ function ProcessoCard({
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
       <p className="text-xs font-medium truncate">{value}</p>
     </div>
   );
@@ -659,7 +660,7 @@ function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => vo
           <Badge 
             variant="outline" 
             className={cn(
-              "text-[10px] px-1.5 py-0",
+              "text-xs px-1.5 py-0",
               processo.risco === "Alto" && "border-destructive/30 bg-destructive/10 text-destructive",
               processo.risco === "Médio" && "border-warning/30 bg-warning/10 text-warning",
               processo.risco === "Baixo" && "border-success/30 bg-success/10 text-success"
@@ -667,7 +668,7 @@ function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => vo
           >
             Risco {processo.risco}
           </Badge>
-          <span className="text-[10px] text-muted-foreground font-mono bg-muted px-1.5 rounded-sm">
+          <span className="text-xs text-muted-foreground font-mono bg-muted px-1.5 rounded-sm">
             {processo.numeroCnj.split("-")[0]}
           </span>
         </div>
@@ -679,7 +680,7 @@ function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => vo
 
         <div className="flex items-center justify-between pt-3 border-t border-border/60">
           <div className="flex items-center gap-1.5 min-w-0 pr-2">
-            <div className="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
+            <div className="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
               {processo.area.slice(0, 1)}
             </div>
             <span className="text-xs text-muted-foreground truncate">{processo.tribunal}</span>

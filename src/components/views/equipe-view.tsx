@@ -139,8 +139,10 @@ export function EquipeView() {
 
   function handleDelete(id: string) {
     const membro = membros.find((m) => m.id === id);
-    setMembros((prev) => prev.filter((m) => m.id !== id));
-    toast.success(`${membro?.nome || "Membro"} removido da equipe`);
+    if (window.confirm(`Tem certeza que deseja remover ${membro?.nome || "este membro"}?`)) {
+      setMembros((prev) => prev.filter((m) => m.id !== id));
+      toast.success(`${membro?.nome || "Membro"} removido da equipe`);
+    }
   }
 
   function handleEdit(membro: MembroEquipe) {
@@ -349,7 +351,7 @@ function PapelStatCard({
             <Icon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
             <p className="text-xl font-bold tabular-nums leading-tight">{value}</p>
           </div>
         </CardContent>
@@ -411,7 +413,7 @@ function MembroCard({
                   <Icon className={cn("h-3 w-3", papelCfg.cor)} />
                   <span className={cn("text-xs font-medium", papelCfg.cor)}>{papelCfg.label}</span>
                   {membro.oab && (
-                    <span className="text-[10px] text-muted-foreground font-mono">· {membro.oab}</span>
+                    <span className="text-xs text-muted-foreground font-mono">· {membro.oab}</span>
                   )}
                 </div>
               </div>
@@ -439,11 +441,11 @@ function MembroCard({
 
           {/* Status badge */}
           <div className="flex items-center gap-1.5 mb-3">
-            <Badge variant="outline" className={cn("text-[10px]", statusCfg.color, statusCfg.bg)}>
+            <Badge variant="outline" className={cn("text-xs", statusCfg.color, statusCfg.bg)}>
               <span className={cn("h-1.5 w-1.5 rounded-full mr-1", statusCfg.dot)} />
               {statusCfg.label}
             </Badge>
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               {membro.cargaHoraria}
             </Badge>
           </div>
@@ -469,15 +471,15 @@ function MembroCard({
           {/* Métricas */}
           <div className="grid grid-cols-3 gap-2 pt-3 border-t">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Processos</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Processos</p>
               <p className="text-base font-bold tabular-nums">{membro.processosAtribuidos}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Tarefas</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Tarefas</p>
               <p className="text-base font-bold tabular-nums text-warning">{membro.tarefasPendentes}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Produtiv.</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Produtiv.</p>
               <p className={cn(
                 "text-base font-bold tabular-nums",
                 membro.produtividade >= 85 ? "text-success" : membro.produtividade >= 70 ? "text-warning" : "text-muted-foreground"
@@ -495,7 +497,7 @@ function MembroCard({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t text-[10px] text-muted-foreground">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-2.5 w-2.5" />
               Desde {format(parseISO(membro.dataEntrada), "MMM/yy", { locale: ptBR })}
@@ -507,7 +509,7 @@ function MembroCard({
           </div>
 
           {membro.supervisor && (
-            <p className="text-[10px] text-muted-foreground mt-2 pt-2 border-t">
+            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
               Supervisor: <span className="font-medium">{membro.supervisor}</span>
             </p>
           )}
@@ -764,7 +766,7 @@ function MembroDialog({
             <Input
               value={supervisor}
               onChange={(e) => setSupervisor(e.target.value)}
-              placeholder="Ex: Dra. Marina Vidal"
+              placeholder="Ex: Advogado(a) Sênior"
             />
           </div>
 
@@ -786,7 +788,7 @@ function MembroDialog({
                     setPermissoes(permissoesCatalogo.map((p) => p.value));
                   }
                 }}
-                className="text-[10px] text-primary hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 {permissoes.length === permissoesCatalogo.length ? "Desmarcar todas" : "Marcar todas"}
               </button>
@@ -798,7 +800,7 @@ function MembroDialog({
                 if (permsGrupo.length === 0) return null;
                 return (
                   <div key={grupo}>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1.5">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-1.5">
                       {grupo}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -825,7 +827,7 @@ function MembroDialog({
                 );
               })}
             </div>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               💡 Ao criar um novo membro, as permissões padrão do papel são aplicadas automaticamente. Você pode ajustar individualmente acima.
             </p>
           </div>
@@ -872,7 +874,7 @@ function PermissoesView({ membro }: { membro?: MembroEquipe }) {
           if (permsGrupo.length === 0) return null;
           return (
             <div key={grupo}>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1.5">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-1.5">
                 {grupo}
               </p>
               <div className="space-y-1">

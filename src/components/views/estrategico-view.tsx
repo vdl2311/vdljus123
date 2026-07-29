@@ -160,7 +160,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
               </div>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold tabular-nums">{healthScore}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Saúde</span>
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">Saúde</span>
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className={cn("text-[9px]", cfg.color, cfg.bg, "border-current/30")}>
+                          <Badge variant="outline" className={cn("text-xs", cfg.color, cfg.bg, "border-current/30")}>
                             Impacto {g.impacto}
                           </Badge>
                           <p className="text-sm font-semibold">{g.categoria}</p>
@@ -232,21 +232,21 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
 
                     <div className="grid grid-cols-3 gap-3 mb-2 mt-3">
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{g.metrica}</p>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground">{g.metrica}</p>
                         <p className={cn("text-lg font-bold tabular-nums", cfg.color)}>{g.valorAtual}</p>
-                        <p className="text-[10px] text-muted-foreground">atual</p>
+                        <p className="text-xs text-muted-foreground">atual</p>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">&nbsp;</p>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground">&nbsp;</p>
                         <p className="text-lg font-bold tabular-nums text-success">{g.valorMeta}</p>
-                        <p className="text-[10px] text-muted-foreground">meta</p>
+                        <p className="text-xs text-muted-foreground">meta</p>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Gap</p>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Gap</p>
                         <p className={cn("text-lg font-bold tabular-nums", gap > 0 ? "text-destructive" : "text-success")}>
                           {gap > 0 ? "+" : ""}{gap.toFixed(0)}%
                         </p>
-                        <p className="text-[10px] text-muted-foreground">vs meta</p>
+                        <p className="text-xs text-muted-foreground">vs meta</p>
                       </div>
                     </div>
 
@@ -350,12 +350,12 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold leading-tight">{a.clienteNome}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{a.processoNumeroCnj}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{a.processoNumeroCnj}</p>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-[10px] h-6 shrink-0 gap-1"
+                        className="text-xs h-6 shrink-0 gap-1"
                         onClick={() => openProcesso(a.processoId)}
                       >
                         Abrir <ChevronRight className="h-3 w-3" />
@@ -366,7 +366,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
 
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <div className="flex items-center justify-between text-[10px] mb-1">
+                        <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-muted-foreground uppercase tracking-widest">Mov. 30d</span>
                           <span className={cn("font-bold tabular-nums", a.probabilidadeMovimentacao30d >= 70 ? "text-success" : a.probabilidadeMovimentacao30d >= 40 ? "text-warning" : "text-muted-foreground")}>
                             {a.probabilidadeMovimentacao30d}%
@@ -375,7 +375,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
                         <Progress value={a.probabilidadeMovimentacao30d} className="h-1.5" />
                       </div>
                       <div>
-                        <div className="flex items-center justify-between text-[10px] mb-1">
+                        <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-muted-foreground uppercase tracking-widest">Risco prazo</span>
                           <span className={cn("font-bold tabular-nums", a.riscoPerdaPrazo >= 50 ? "text-destructive" : a.riscoPerdaPrazo >= 25 ? "text-warning" : "text-success")}>
                             {a.riscoPerdaPrazo}%
@@ -384,7 +384,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
                         <Progress value={a.riscoPerdaPrazo} className="h-1.5 [&>div]:bg-destructive" />
                       </div>
                       <div>
-                        <div className="flex items-center justify-between text-[10px] mb-1">
+                        <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-muted-foreground uppercase tracking-widest">Sem mov.</span>
                           <span className="font-bold tabular-nums">{a.diasSemMovimentacao}d</span>
                         </div>
@@ -424,7 +424,7 @@ Gere 3 recomendações estratégicas PRIORITÁRIAS para os próximos 30 dias. Pa
               <a.icon className="h-4 w-4" />
             </div>
             <p className="text-xs font-medium leading-tight">{a.label}</p>
-            <p className="text-[10px] text-primary flex items-center gap-0.5">
+            <p className="text-xs text-primary flex items-center gap-0.5">
               Agir agora <ArrowRight className="h-2.5 w-2.5" />
             </p>
           </button>

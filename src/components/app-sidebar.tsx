@@ -286,7 +286,7 @@ function SidebarContent({
               <span className="font-bold text-[15px] tracking-tight truncate">
                 JurisFlow
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+              <span className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">
                 v2 · 2026
               </span>
             </div>
@@ -376,7 +376,7 @@ function NavGroup({
   return (
     <div>
       {title && (
-        <div className="px-3 mb-1.5 text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold">
+        <div className="px-3 mb-1.5 text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
           {title}
         </div>
       )}
@@ -410,7 +410,7 @@ function NavGroup({
                       <Badge
                         variant={isActive ? "default" : "secondary"}
                         className={cn(
-                          "h-5 px-1.5 text-[10px] tabular-nums",
+                          "h-5 px-1.5 text-xs tabular-nums",
                           isActive && "bg-primary text-primary-foreground"
                         )}
                       >

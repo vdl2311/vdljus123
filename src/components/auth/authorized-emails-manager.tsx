@@ -81,7 +81,7 @@ export function AuthorizedEmailsManager() {
                     </div>
                     <span className="font-medium truncate">{email}</span>
                     {isCurrentUser && (
-                      <Badge variant="secondary" className="text-[10px] py-0 px-1.5 h-4">
+                      <Badge variant="secondary" className="text-xs py-0 px-1.5 h-4">
                         Sua conta
                       </Badge>
                     )}

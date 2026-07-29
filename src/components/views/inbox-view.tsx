@@ -64,7 +64,7 @@ export function InboxView() {
                 <AlertTriangle className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Ação Necessária</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Ação Necessária</p>
                 <p className="text-lg font-bold text-destructive tabular-nums">{counts.acao}</p>
               </div>
             </div>
@@ -77,7 +77,7 @@ export function InboxView() {
                 <Clock className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Importante</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Importante</p>
                 <p className="text-lg font-bold text-warning tabular-nums">{counts.importante}</p>
               </div>
             </div>
@@ -90,7 +90,7 @@ export function InboxView() {
                 <InboxIcon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Pode Esperar</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Pode Esperar</p>
                 <p className="text-lg font-bold text-info tabular-nums">{counts.podeEsperar}</p>
               </div>
             </div>
@@ -161,28 +161,28 @@ export function InboxView() {
                     <p className="text-xs text-muted-foreground mb-2">{item.descricao}</p>
 
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-xs">
                         {item.tipo}
                       </Badge>
                       <Badge
                         variant={item.classificacaoIa === "Ação Necessária" ? "destructive" : "secondary"}
-                        className="text-[10px] gap-0.5"
+                        className="text-xs gap-0.5"
                       >
                         <Sparkles className="h-2.5 w-2.5" />
                         {item.classificacaoIa}
                       </Badge>
                       {item.prazoSugeridoDias && (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           <Clock className="h-2.5 w-2.5 mr-0.5" />
                           {item.prazoSugeridoDias}d
                         </Badge>
                       )}
                       {item.processoNumeroCnj && (
-                        <span className="text-[10px] text-muted-foreground font-mono">
+                        <span className="text-xs text-muted-foreground font-mono">
                           {item.processoNumeroCnj.slice(0, 16)}...
                         </span>
                       )}
-                      <span className="text-[10px] text-muted-foreground ml-auto">
+                      <span className="text-xs text-muted-foreground ml-auto">
                         {formatDistanceToNow(new Date(item.dataHora), { addSuffix: true, locale: ptBR })}
                       </span>
                     </div>

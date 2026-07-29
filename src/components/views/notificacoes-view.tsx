@@ -63,7 +63,7 @@ export function NotificacoesView() {
               <Bell className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Total</p>
               <p className="text-lg font-bold tabular-nums">{stats.total}</p>
             </div>
           </CardContent>
@@ -74,7 +74,7 @@ export function NotificacoesView() {
               <span className="h-2 w-2 rounded-full bg-primary pulse-ring" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Não lidas</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Não lidas</p>
               <p className="text-lg font-bold tabular-nums text-primary">{stats.naoLidas}</p>
             </div>
           </CardContent>
@@ -85,7 +85,7 @@ export function NotificacoesView() {
               <XCircle className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Erros</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Erros</p>
               <p className="text-lg font-bold tabular-nums text-destructive">{stats.erros}</p>
             </div>
           </CardContent>
@@ -96,7 +96,7 @@ export function NotificacoesView() {
               <AlertTriangle className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Avisos</p>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Avisos</p>
               <p className="text-lg font-bold tabular-nums text-warning">{stats.avisos}</p>
             </div>
           </CardContent>
@@ -188,7 +188,7 @@ export function NotificacoesView() {
                         </div>
                         <p className="text-xs text-muted-foreground">{n.descricao}</p>
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(n.dataHora), { addSuffix: true, locale: ptBR })}
                           </span>
                           <div className="flex items-center gap-1">
@@ -196,7 +196,7 @@ export function NotificacoesView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-[10px] h-6"
+                                className="text-xs h-6"
                                 onClick={() => setView(n.link!)}
                               >
                                 Ver
@@ -206,7 +206,7 @@ export function NotificacoesView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-[10px] h-6 gap-1"
+                                className="text-xs h-6 gap-1"
                                 onClick={() => marcarNotificacaoLida(n.id)}
                               >
                                 <Check className="h-3 w-3" />
