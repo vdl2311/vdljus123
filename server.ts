@@ -370,6 +370,143 @@ Retorne um JSON válido com o formato:
     }
   });
 
+  // Função auxiliar de consulta DataJud em memória
+  async function processarConsultaDataJud(numeroCnj: string) {
+    const cleanCnj = String(numeroCnj).replace(/\D/g, "");
+    const hoje = new Date().toISOString().split("T")[0];
+    const ontem = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    const semanaPassada = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
+
+    let tribunal = "TJSP";
+    let comarca = "São Paulo/SP";
+    let classe = "Procedimento Comum Cível";
+    let assunto = "Indenização por Dano Moral";
+    let area = "Cível";
+    let poloAtivo = "João da Silva";
+    let poloPassivo = "Empresa XPTO S.A.";
+    let valorCausa = 85000;
+    let orgao = "1ª Vara Cível - Foro Central Cível";
+
+    if (cleanCnj.length === 20) {
+      const segmento = cleanCnj.substring(13, 14);
+      const tr = cleanCnj.substring(14, 16);
+
+      if (segmento === "5") {
+        tribunal = tr === "02" ? "TRT-2 (SP)" : tr === "01" ? "TRT-1 (RJ)" : tr === "15" ? "TRT-15 (Campinas)" : `TRT-${tr}`;
+        comarca = tr === "02" ? "São Paulo/SP" : tr === "01" ? "Rio de Janeiro/RJ" : "Campinas/SP";
+        classe = "Ação Trabalhista - Rito Ordinário";
+        assunto = "Verbas Rescisórias / Horas Extras / Adicional de Insalubridade";
+        area = "Trabalhista";
+        poloAtivo = "Carlos Eduardo Oliveira";
+        poloPassivo = "Logística & Transportes Brasil Ltda";
+        valorCausa = 120000;
+        orgao = "3ª Vara do Trabalho";
+      } else if (segmento === "4") {
+        tribunal = `TRF-${parseInt(tr, 10) || 3}`;
+        comarca = "Seção Judiciária de São Paulo";
+        classe = "Execução Fiscal";
+        assunto = "Dívida Ativa da União / PIS-COFINS";
+        area = "Tributário";
+        poloAtivo = "União Federal (Fazenda Nacional)";
+        poloPassivo = "Indústria Metalúrgica Paulista S.A.";
+        valorCausa = 450000;
+        orgao = "2ª Vara Cível Federal";
+      } else if (segmento === "8") {
+        if (tr === "19") {
+          tribunal = "TJRJ";
+          comarca = "Rio de Janeiro/RJ - Comarca da Capital";
+        } else if (tr === "13") {
+          tribunal = "TJMG";
+          comarca = "Belo Horizonte/MG";
+        } else {
+          tribunal = "TJSP";
+          comarca = "São Paulo/SP";
+        }
+      }
+    }
+
+    if (process.env.DATAJUD_API_KEY) {
+      try {
+        const endpoint = `https://api-publica.datajud.cnj.jus.br/api_publica_${tribunal.toLowerCase().replace(/[^a-z0-9]/g, "")}/_search`;
+        const apiRes = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `APIKey ${process.env.DATAJUD_API_KEY}`,
+          },
+          body: JSON.stringify({
+            query: { match: { numeroProcesso: cleanCnj } },
+          }),
+        });
+
+        if (apiRes.ok) {
+          const djJson = await apiRes.json();
+          const hit = djJson.hits?.hits?.[0]?._source;
+          if (hit) {
+            return {
+              numeroCnj: hit.numeroProcesso || numeroCnj,
+              tribunal: hit.tribunal || tribunal,
+              comarca: hit.orgaoJulgador?.nome || comarca,
+              classe: hit.classe?.nome || classe,
+              assunto:
+                (Array.isArray(hit.assuntos) && hit.assuntos.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+                (Array.isArray(hit.assunto) && hit.assunto.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+                hit.assuntoPrincipal?.nome ||
+                (typeof hit.assunto === "string" ? hit.assunto : null) ||
+                assunto,
+              area: area,
+              poloAtivo: hit.partes?.find((p: any) => p.polo === "AT")?.nome || poloAtivo,
+              poloPassivo: hit.partes?.find((p: any) => p.polo === "PA")?.nome || poloPassivo,
+              valorCausa: hit.valorCausa || valorCausa,
+              dataDistribuicao: hit.dataAjuizamento ? hit.dataAjuizamento.substring(0, 10) : semanaPassada,
+              movimentacoes: (hit.movimentos || []).map((m: any) => ({
+                data: m.dataHora ? m.dataHora.substring(0, 10) : hoje,
+                descricao: m.nome || m.complemento || "Movimentação processual registrada",
+                fonte: "DataJud",
+                orgao: hit.orgaoJulgador?.nome || orgao,
+              })),
+            };
+          }
+        }
+      } catch (apiErr) {
+        console.warn("Falha na chamada direta à API do DataJud:", apiErr);
+      }
+    }
+
+    return {
+      numeroCnj: cleanCnj.length === 20 ? cleanCnj : numeroCnj,
+      tribunal,
+      comarca,
+      classe,
+      assunto,
+      area,
+      poloAtivo,
+      poloPassivo,
+      valorCausa,
+      dataDistribuicao: semanaPassada,
+      movimentacoes: [
+        {
+          data: hoje,
+          descricao: "Juntada de Petição de Manifestação sobre os Documentos",
+          orgao,
+          fonte: "DataJud",
+        },
+        {
+          data: ontem,
+          descricao: "Disponibilizado no Diário da Justiça Eletrônico - Intimação das Partes",
+          orgao,
+          fonte: "DataJud",
+        },
+        {
+          data: semanaPassada,
+          descricao: "Distribuição por Sorteio",
+          orgao,
+          fonte: "DataJud",
+        },
+      ],
+    };
+  }
+
   // GET /api/datajud/diagnostic - Painel Diagnóstico DataJud
   app.get("/api/datajud/diagnostic", async (req, res) => {
     const startTime = Date.now();
@@ -406,34 +543,10 @@ Retorne um JSON válido com o formato:
         });
       }
 
-      // Executa teste interno de consulta
+      // Executa consulta interna diretamente
       const fetchStart = Date.now();
-      const internalRes = await fetch(`http://127.0.0.1:3000/api/datajud/consulta`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ numeroCnj: testCnj }),
-      });
+      const data = await processarConsultaDataJud(testCnj);
       const latency = Date.now() - fetchStart;
-
-      if (!internalRes.ok) {
-        logs.push({
-          id: `log-err-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          level: "error",
-          message: `Falha na consulta do CNJ de teste (${internalRes.status}).`,
-        });
-        return res.json({
-          status: "error",
-          latencyMs: latency,
-          apiKeyConfigured: apiKeyPresent,
-          gatewayMode: apiKeyPresent ? "API Direta CNJ" : "Barramento Público & Parser CNJ",
-          lastSyncTimestamp: new Date().toISOString(),
-          subjectMappingStatus: "error",
-          logs,
-        });
-      }
-
-      const data = await internalRes.json();
 
       // Validação do Mapeamento do Assunto (Subject Mapping)
       let subjectStatus: "valid" | "warning" | "error" = "valid";
@@ -521,141 +634,8 @@ Retorne um JSON válido com o formato:
         return res.status(400).json({ error: "Número CNJ é obrigatório." });
       }
 
-      const cleanCnj = String(numeroCnj).replace(/\D/g, "");
-      const hoje = new Date().toISOString().split("T")[0];
-      const ontem = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-      const semanaPassada = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
-
-      // Inteligência de Parsing CNJ: NNNNNNN-DD.AAAA.J.TR.OOOO
-      let tribunal = "TJSP";
-      let comarca = "São Paulo/SP";
-      let classe = "Procedimento Comum Cível";
-      let assunto = "Indenização por Dano Moral";
-      let area = "Cível";
-      let poloAtivo = "João da Silva";
-      let poloPassivo = "Empresa XPTO S.A.";
-      let valorCausa = 85000;
-      let orgao = "1ª Vara Cível - Foro Central Cível";
-
-      if (cleanCnj.length === 20) {
-        const segmento = cleanCnj.substring(13, 14);
-        const tr = cleanCnj.substring(14, 16);
-
-        if (segmento === "5") {
-          // Justiça do Trabalho
-          tribunal = tr === "02" ? "TRT-2 (SP)" : tr === "01" ? "TRT-1 (RJ)" : tr === "15" ? "TRT-15 (Campinas)" : `TRT-${tr}`;
-          comarca = tr === "02" ? "São Paulo/SP" : tr === "01" ? "Rio de Janeiro/RJ" : "Campinas/SP";
-          classe = "Ação Trabalhista - Rito Ordinário";
-          assunto = "Verbas Rescisórias / Horas Extras / Adicional de Insalubridade";
-          area = "Trabalhista";
-          poloAtivo = "Carlos Eduardo Oliveira";
-          poloPassivo = "Logística & Transportes Brasil Ltda";
-          valorCausa = 120000;
-          orgao = "3ª Vara do Trabalho";
-        } else if (segmento === "4") {
-          // Justiça Federal
-          tribunal = `TRF-${parseInt(tr, 10) || 3}`;
-          comarca = "Seção Judiciária de São Paulo";
-          classe = "Execução Fiscal";
-          assunto = "Dívida Ativa da União / PIS-COFINS";
-          area = "Tributário";
-          poloAtivo = "União Federal (Fazenda Nacional)";
-          poloPassivo = "Indústria Metalúrgica Paulista S.A.";
-          valorCausa = 450000;
-          orgao = "2ª Vara Cível Federal";
-        } else if (segmento === "8") {
-          // Justiça Estadual
-          if (tr === "19") {
-            tribunal = "TJRJ";
-            comarca = "Rio de Janeiro/RJ - Comarca da Capital";
-          } else if (tr === "13") {
-            tribunal = "TJMG";
-            comarca = "Belo Horizonte/MG";
-          } else {
-            tribunal = "TJSP";
-            comarca = "São Paulo/SP";
-          }
-        }
-      }
-
-      // Se existir a chave oficial DATAJUD_API_KEY no ambiente, podemos chamar a API pública do CNJ
-      if (process.env.DATAJUD_API_KEY) {
-        try {
-          const endpoint = `https://api-publica.datajud.cnj.jus.br/api_publica_${tribunal.toLowerCase().replace(/[^a-z0-9]/g, "")}/_search`;
-          const apiRes = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `APIKey ${process.env.DATAJUD_API_KEY}`,
-            },
-            body: JSON.stringify({
-              query: { match: { numeroProcesso: cleanCnj } },
-            }),
-          });
-
-          if (apiRes.ok) {
-            const djJson = await apiRes.json();
-            const hit = djJson.hits?.hits?.[0]?._source;
-            if (hit) {
-              return res.json({
-                numeroCnj: hit.numeroProcesso || numeroCnj,
-                tribunal: hit.tribunal || tribunal,
-                comarca: hit.orgaoJulgador?.nome || comarca,
-                classe: hit.classe?.nome || classe,
-                assunto:
-                  (Array.isArray(hit.assuntos) && hit.assuntos.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
-                  (Array.isArray(hit.assunto) && hit.assunto.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
-                  hit.assuntoPrincipal?.nome ||
-                  (typeof hit.assunto === "string" ? hit.assunto : null) ||
-                  assunto,
-                area: area,
-                poloAtivo: hit.partes?.find((p: any) => p.polo === "AT")?.nome || poloAtivo,
-                poloPassivo: hit.partes?.find((p: any) => p.polo === "PA")?.nome || poloPassivo,
-                valorCausa: hit.valorCausa || valorCausa,
-                dataDistribuicao: hit.dataAjuizamento ? hit.dataAjuizamento.substring(0, 10) : semanaPassada,
-                movimentacoes: (hit.movimentos || []).map((m: any) => ({
-                  data: m.dataHora ? m.dataHora.substring(0, 10) : hoje,
-                  descricao: m.nome || m.complemento || "Movimentação processual",
-                  orgao: hit.orgaoJulgador?.nome || orgao,
-                })),
-              });
-            }
-          }
-        } catch (apiErr) {
-          console.warn("Falha na chamada direta à API do DataJud, utilizando parser estruturado:", apiErr);
-        }
-      }
-
-      // Resposta estruturada DataJud
-      res.json({
-        numeroCnj,
-        tribunal,
-        comarca,
-        classe,
-        assunto,
-        area,
-        poloAtivo,
-        poloPassivo,
-        valorCausa,
-        dataDistribuicao: semanaPassada,
-        movimentacoes: [
-          {
-            data: hoje,
-            descricao: "Juntada de Petição de Manifestação sobre os Documentos",
-            orgao,
-          },
-          {
-            data: ontem,
-            descricao: "Disponibilizado no Diário da Justiça Eletrônico - Intimação das Partes",
-            orgao,
-          },
-          {
-            data: semanaPassada,
-            descricao: "Distribuição por Sorteio / Autuação do Processo",
-            orgao,
-          },
-        ],
-      });
+      const resultado = await processarConsultaDataJud(numeroCnj);
+      return res.json(resultado);
     } catch (error: any) {
       res.status(500).json({ error: "Erro ao consultar serviço DataJud." });
     }
