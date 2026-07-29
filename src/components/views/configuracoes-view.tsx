@@ -13,6 +13,8 @@ import {
   Sun,
   Moon,
   Monitor,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +36,7 @@ import { Mail, KeyRound } from "lucide-react";
 
 export function ConfiguracoesView() {
   const { theme, setTheme } = useTheme();
-  const { user, loginWithGoogle, logout } = useAppStore();
+  const { user, loginWithGoogle, logout, limparDadosDemonstracao, processos, clientes } = useAppStore();
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const [notificacoes, setNotificacoes] = React.useState({
     datajud: true,
@@ -373,6 +375,45 @@ export function ConfiguracoesView() {
                 )}
               </div>
             ))}
+          </CardContent>
+        </Card>
+
+        {/* Modo do Sistema & Dados Reais */}
+        <Card className="border-destructive/30 bg-destructive/5">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold flex items-center gap-1.5 text-destructive">
+              <Database className="h-4 w-4" />
+              Ambiente de Produção & Dados Reais
+            </CardTitle>
+            <CardDescription>
+              Alterne para o modo de operação real removendo dados de demonstração (mock).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-destructive/20 bg-background">
+              <div>
+                <p className="text-sm font-semibold">Limpar Dados de Demonstração</p>
+                <p className="text-xs text-muted-foreground">
+                  Remove os processos, clientes e documentos fictícios iniciais para que você possa cadastrar apenas dados reais do escritório.
+                </p>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="gap-1.5 shrink-0"
+                onClick={() => {
+                  if (confirm("Tem certeza que deseja remover todos os dados de demonstração? Isso deixará seu banco limpo para cadastros reais.")) {
+                    limparDadosDemonstracao();
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+                Limpar Demonstração
+              </Button>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Total atual no sistema: <strong className="text-foreground">{processos.length}</strong> processos | <strong className="text-foreground">{clientes.length}</strong> clientes.
+            </div>
           </CardContent>
         </Card>
 

@@ -448,7 +448,12 @@ app.post("/api/datajud/consulta", async (req, res) => {
               tribunal: hit.tribunal || tribunal,
               comarca: hit.orgaoJulgador?.nome || comarca,
               classe: hit.classe?.nome || classe,
-              assunto: hit.assunto?.[0]?.nome || assunto,
+                assunto:
+                  (Array.isArray(hit.assuntos) && hit.assuntos.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+                  (Array.isArray(hit.assunto) && hit.assunto.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+                  hit.assuntoPrincipal?.nome ||
+                  (typeof hit.assunto === "string" ? hit.assunto : null) ||
+                  assunto,
               area: area,
               poloAtivo: hit.partes?.find((p: any) => p.polo === "AT")?.nome || poloAtivo,
               poloPassivo: hit.partes?.find((p: any) => p.polo === "PA")?.nome || poloPassivo,

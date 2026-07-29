@@ -70,6 +70,7 @@ interface AppState {
   marcarTodasNotificacoesLidas: () => void;
   addChatMessage: (m: AiChatMessage) => void;
   clearChat: () => void;
+  limparDadosDemonstracao: () => void;
   
   // Auth
   user: any | null;
@@ -315,6 +316,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   addChatMessage: (m) =>
     set((s) => ({ chatMessages: [...s.chatMessages, m] })),
   clearChat: () => set({ chatMessages: [] }),
+  limparDadosDemonstracao: () => {
+    localStorage.removeItem(STORAGE_KEYS.PROCESSOS);
+    localStorage.removeItem(STORAGE_KEYS.CLIENTES);
+    localStorage.removeItem(STORAGE_KEYS.TAREFAS);
+    localStorage.removeItem(STORAGE_KEYS.DOCUMENTOS);
+    set({
+      processos: [],
+      clientes: [],
+      tarefas: [],
+      documentos: [],
+      inbox: [],
+      notificacoes: [],
+    });
+    toast.success("Dados de demonstração removidos. O sistema está limpo para uso real!");
+  },
 
   loginWithGoogle: async () => {
     try {
