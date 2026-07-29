@@ -3,7 +3,6 @@ import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, dele
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  GithubAuthProvider, 
   signInWithPopup, 
   signOut,
   signInWithEmailAndPassword,
@@ -17,7 +16,6 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || "(default)");
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-export const githubProvider = new GithubAuthProvider();
 
 export {
   signInWithPopup,

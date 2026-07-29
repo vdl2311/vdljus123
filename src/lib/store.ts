@@ -81,7 +81,6 @@ interface AppState {
   // Initialization
   initFirebase: () => void;
   loginWithGoogle: () => Promise<void>;
-  loginWithGithub: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   signUpWithEmail: (email: string, pass: string, nome: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
@@ -94,7 +93,6 @@ import {
   db, 
   auth, 
   googleProvider, 
-  githubProvider, 
   signInWithPopup, 
   signOut, 
   signInWithEmailAndPassword,
@@ -326,16 +324,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     } catch (e: any) {
       logger.error("auth", "Login failed", e);
       set({ authError: e.message || "Falha ao entrar com Google." });
-    }
-  },
-  loginWithGithub: async () => {
-    try {
-      set({ authError: null });
-      await signInWithPopup(auth, githubProvider);
-      logger.info("auth", "User logged in with GitHub");
-    } catch (e: any) {
-      logger.error("auth", "GitHub Login failed", e);
-      set({ authError: e.message || "Falha ao entrar com GitHub." });
     }
   },
   loginWithEmail: async (email, pass) => {
