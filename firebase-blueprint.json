@@ -80,6 +80,42 @@
         "status": { "type": "string" }
       },
       "required": ["nome", "email", "papel"]
+    },
+    "emails_autorizados": {
+      "title": "E-mails Autorizados",
+      "description": "E-mails permitidos para login e acesso ao sistema",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "criadoEm": { "type": "string" }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "/processos/{processoId}": {
+      "schema": "processos",
+      "description": "Coleção principal de processos judiciais"
+    },
+    "/clientes/{clienteId}": {
+      "schema": "clientes",
+      "description": "Coleção de clientes do escritório"
+    },
+    "/tarefas/{tarefaId}": {
+      "schema": "tarefas",
+      "description": "Coleção de tarefas, prazos e audiências"
+    },
+    "/documentos/{documentoId}": {
+      "schema": "documentos",
+      "description": "Coleção de documentos e petições"
+    },
+    "/equipe/{membroId}": {
+      "schema": "equipe",
+      "description": "Coleção de membros da equipe"
+    },
+    "/emails_autorizados/{docId}": {
+      "schema": "emails_autorizados",
+      "description": "E-mails autorizados para acesso ao sistema"
     }
   }
 }

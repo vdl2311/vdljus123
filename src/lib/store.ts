@@ -18,6 +18,7 @@ import {
   documentos as seedDocumentos,
   inboxItens as seedInbox,
   notificacoes as seedNotificacoes,
+  membrosEquipe as seedEquipe,
 } from "./seed-data";
 
 interface AppState {
@@ -607,6 +608,94 @@ export const useAppStore = create<AppState>((set, get) => ({
         },
         (error) => {
           logger.warn("system", "Firestore info on tarefas snapshot", error);
+        }
+      );
+
+      // Listen to Documentos
+      onSnapshot(
+        collection(db, "documentos"),
+        (snapshot) => {
+          const firestoreDocumentos = snapshot.docs.map((doc) => doc.data() as Documento);
+          if (firestoreDocumentos.length > 0) {
+            set((s) => {
+              const map = new Map<string, Documento>();
+              s.documentos.forEach((d) => map.set(d.id, d));
+              firestoreDocumentos.forEach((d) => map.set(d.id, d));
+              const merged = Array.from(map.values());
+              return { documentos: merged };
+            });
+          } else {
+            const current = get().documentos;
+            current.forEach((d) => {
+              setDoc(doc(db, "documentos", d.id), cleanForFirestore(d)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on documentos snapshot", error);
+        }
+      );
+
+      // Listen to Inbox
+      onSnapshot(
+        collection(db, "inbox"),
+        (snapshot) => {
+          const firestoreInbox = snapshot.docs.map((doc) => doc.data() as InboxJuridicoItem);
+          if (firestoreInbox.length > 0) {
+            set((s) => {
+              const map = new Map<string, InboxJuridicoItem>();
+              s.inbox.forEach((i) => map.set(i.id, i));
+              firestoreInbox.forEach((i) => map.set(i.id, i));
+              return { inbox: Array.from(map.values()) };
+            });
+          } else {
+            const current = get().inbox;
+            current.forEach((i) => {
+              setDoc(doc(db, "inbox", i.id), cleanForFirestore(i)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on inbox snapshot", error);
+        }
+      );
+
+      // Listen to Notificacoes
+      onSnapshot(
+        collection(db, "notificacoes"),
+        (snapshot) => {
+          const firestoreNotifs = snapshot.docs.map((doc) => doc.data() as Notificacao);
+          if (firestoreNotifs.length > 0) {
+            set((s) => {
+              const map = new Map<string, Notificacao>();
+              s.notificacoes.forEach((n) => map.set(n.id, n));
+              firestoreNotifs.forEach((n) => map.set(n.id, n));
+              return { notificacoes: Array.from(map.values()) };
+            });
+          } else {
+            const current = get().notificacoes;
+            current.forEach((n) => {
+              setDoc(doc(db, "notificacoes", n.id), cleanForFirestore(n)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on notificacoes snapshot", error);
+        }
+      );
+
+      // Listen to Equipe
+      onSnapshot(
+        collection(db, "equipe"),
+        (snapshot) => {
+          if (snapshot.docs.length === 0) {
+            seedEquipe.forEach((m) => {
+              setDoc(doc(db, "equipe", m.id), cleanForFirestore(m)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on equipe snapshot", error);
         }
       );
     } catch (e) {
