@@ -95,12 +95,7 @@ export function ProcessosView() {
   const [datajudResult, setDatajudResult] = React.useState<any>(null);
   const [cnjInput, setCnjInput] = React.useState("");
   const [viewMode, setViewMode] = React.useState<"list" | "kanban">("list");
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 350);
-    return () => clearTimeout(timer);
-  }, []);
+  const [loading, setLoading] = React.useState(false);
 
   const filtered = React.useMemo(() => {
     return processos.filter((p) => {

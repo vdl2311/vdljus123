@@ -51,12 +51,7 @@ export function JurisprudenciaView() {
   const [explicando, setExplicando] = React.useState<string | null>(null);
   const [explicacao, setExplicacao] = React.useState<Record<string, any>>({});
   const { setAiPanelOpen } = useAppStore();
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 350);
-    return () => clearTimeout(timer);
-  }, []);
+  const [loading, setLoading] = React.useState(false);
 
   const areas = ["todas", ...Array.from(new Set(jurisprudencias.map((j) => j.area)))];
 

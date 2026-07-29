@@ -263,7 +263,7 @@ function TarefaCard({
             </div>
           )}
 
-          <Badge variant="secondary" className="text-[9px] mt-2">
+          <Badge variant="secondary" className="text-xs mt-2">
             {tarefa.categoria}
           </Badge>
         </CardContent>
@@ -273,7 +273,7 @@ function TarefaCard({
 }
 
 function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
-  const { processos } = useAppStore();
+  const { processos, user } = useAppStore();
   const [descricao, setDescricao] = React.useState("");
   const [dataLimite, setDataLimite] = React.useState("");
   const [prioridade, setPrioridade] = React.useState<TarefaPrioridade>("Média");
@@ -291,8 +291,8 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
       descricao,
       processoId: processoId || undefined,
       processoNumeroCnj: proc?.numeroCnj,
-      responsavelId: "u-001",
-      responsavelNome: "Dra. Marina Vidal",
+      responsavelId: user?.uid || "u-001",
+      responsavelNome: user?.displayName || "Advogado(a)",
       dataLimite,
       prioridade,
       status: "Pendente",
@@ -305,7 +305,7 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
   }
 
   return (
-    <DialogContent className="sm:max-w-[480px]">
+    <DialogContent className="sm:max-w-[520px]">
       <DialogHeader>
         <DialogTitle>Nova tarefa</DialogTitle>
       </DialogHeader>
@@ -362,10 +362,11 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
               <SelectTrigger>
                 <SelectValue placeholder="Nenhum" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60">
                 {processos.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
-                    {p.numeroCnj.slice(0, 16)}...
+                    <span className="font-mono text-xs font-semibold mr-1">{p.numeroCnj.slice(0, 15)}...</span>
+                    <span className="text-muted-foreground text-xs font-normal">({p.clienteNome})</span>
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, onSnapshot, query, orderBy, setDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, onSnapshot, query, orderBy, setDoc, enableIndexedDbPersistence } from "firebase/firestore";
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -36,5 +36,6 @@ export {
   onSnapshot,
   query,
   orderBy,
-  setDoc
+  setDoc,
+  enableIndexedDbPersistence
 };

@@ -66,12 +66,7 @@ const statusConfig: Record<string, { color: string; bg: string; label: string }>
 export function FinanceiroView() {
   const [filtro, setFiltro] = React.useState<"todos" | "Receita" | "Despesa" | "Honorário" | "Custa">("todos");
   const [statusFiltro, setStatusFiltro] = React.useState("todos");
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 350);
-    return () => clearTimeout(timer);
-  }, []);
+  const [loading, setLoading] = React.useState(false);
 
   const lancamentos = React.useMemo(() => {
     return lancamentosFinanceiros

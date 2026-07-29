@@ -107,7 +107,8 @@ import {
   doc, 
   getDoc,
   deleteDoc, 
-  setDoc 
+  setDoc,
+  enableIndexedDbPersistence
 } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { logger } from "./logger";
@@ -494,6 +495,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   initFirebase: async () => {
     if (firebaseInitialized) return;
     firebaseInitialized = true;
+
+    // Enable IndexedDB offline persistence
+    try {
+      await enableIndexedDbPersistence(db);
+      logger.info("system", "Firestore offline persistence enabled successfully");
+    } catch (err: any) {
+      if (err.code === "failed-precondition") {
+        logger.warn("system", "Persistence failed: Multiple tabs open.");
+      } else if (err.code === "unimplemented") {
+        logger.warn("system", "Persistence is not supported by this browser.");
+      }
+    }
 
     // Listen to Authorized Emails collection
     try {

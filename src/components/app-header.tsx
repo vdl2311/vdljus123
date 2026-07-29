@@ -140,17 +140,28 @@ export function AppHeader() {
   // Use real user data if available, fallback to seed
   const displayName = user?.displayName || currentUser.nome;
   const email = user?.email || currentUser.email;
+  const firstName = displayName.split(" ")[0] || "Advogado(a)";
+
+  const dynamicInfo = {
+    ...info,
+    title: currentView === "dashboard" ? `Bom dia, ${firstName}` : info.title,
+  };
 
   return (
     <header className="sticky top-0 z-30 glass border-b border-border">
       <div className="flex h-16 items-center gap-3 px-4 md:px-6 pl-16 md:pl-6">
-        {/* Title */}
+        {/* Title & Breadcrumb */}
         <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+            <span>JurisFlow</span>
+            <span>/</span>
+            <span className="font-medium text-foreground">{dynamicInfo.title}</span>
+          </div>
           <h1 className="text-base md:text-lg font-semibold leading-tight truncate">
-            {info.title}
+            {dynamicInfo.title}
           </h1>
           <p className="text-xs text-muted-foreground truncate hidden sm:block">
-            {info.subtitle}
+            {dynamicInfo.subtitle}
           </p>
         </div>
 
