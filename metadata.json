@@ -1,0 +1,8 @@
+{
+  "name": "Remix VDL Juris",
+  "description": "Sistema de Gestão Jurídica Inteligente, Automação Processual, Copiloto IA e DataJud com Firebase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

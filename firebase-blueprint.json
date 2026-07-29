@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "processos": {
+      "title": "Processos",
+      "description": "Processos judiciais e administrativos",
+      "type": "object",
+      "properties": {
+        "numeroCnj": { "type": "string" },
+        "tribunal": { "type": "string" },
+        "comarca": { "type": "string" },
+        "classeProcessual": { "type": "string" },
+        "assunto": { "type": "string" },
+        "area": { "type": "string" },
+        "risco": { "type": "string" },
+        "partes": { "type": "object" },
+        "advogadoResponsavelId": { "type": "string" },
+        "advogadoResponsavelNome": { "type": "string" },
+        "clienteId": { "type": "string" },
+        "clienteNome": { "type": "string" },
+        "status": { "type": "string" },
+        "movimentacoes": { "type": "array" },
+        "tags": { "type": "array" },
+        "datasImportantes": { "type": "object" },
+        "valorCausa": { "type": "number" },
+        "resumoIa": { "type": "string" },
+        "probabilidadeSucesso": { "type": "number" }
+      },
+      "required": ["numeroCnj", "tribunal", "clienteNome", "status"]
+    },
+    "clientes": {
+      "title": "Clientes",
+      "description": "Pessoas Físicas e Jurídicas atendidas pelo escritório",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "tipo": { "type": "string" },
+        "cpfCnpj": { "type": "string" },
+        "email": { "type": "string" },
+        "telefone": { "type": "string" },
+        "status": { "type": "string" },
+        "dataCadastro": { "type": "string" }
+      },
+      "required": ["nome", "tipo", "status"]
+    },
+    "tarefas": {
+      "title": "Tarefas",
+      "description": "Prazos, audiências, reuniões e diligências",
+      "type": "object",
+      "properties": {
+        "descricao": { "type": "string" },
+        "responsavelNome": { "type": "string" },
+        "dataLimite": { "type": "string" },
+        "prioridade": { "type": "string" },
+        "status": { "type": "string" },
+        "categoria": { "type": "string" }
+      },
+      "required": ["descricao", "dataLimite", "status"]
+    },
+    "documentos": {
+      "title": "Documentos",
+      "description": "Documentos e petições do escritório",
+      "type": "object",
+      "properties": {
+        "tipo": { "type": "string" },
+        "nome": { "type": "string" },
+        "tamanho": { "type": "string" },
+        "dataUpload": { "type": "string" },
+        "statusIa": { "type": "string" }
+      },
+      "required": ["nome", "tipo"]
+    },
+    "equipe": {
+      "title": "Membros da Equipe",
+      "description": "Sócios, advogados, secretárias e estagiários",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "email": { "type": "string" },
+        "papel": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["nome", "email", "papel"]
+    }
+  }
+}
