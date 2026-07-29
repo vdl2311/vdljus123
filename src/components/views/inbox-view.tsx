@@ -56,42 +56,42 @@ export function InboxView() {
   return (
     <div className="space-y-4">
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card className="border-destructive/20">
           <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
                 <AlertTriangle className="h-4 w-4" />
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">Ação Necessária</p>
-                <p className="text-lg font-bold text-destructive tabular-nums">{counts.acao}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">Ação Necessária</p>
+                <p className="text-base sm:text-lg font-bold text-destructive tabular-nums">{counts.acao}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card className="border-warning/20">
           <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/15 text-warning">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warning/15 text-warning">
                 <Clock className="h-4 w-4" />
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">Importante</p>
-                <p className="text-lg font-bold text-warning tabular-nums">{counts.importante}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">Importante</p>
+                <p className="text-base sm:text-lg font-bold text-warning tabular-nums">{counts.importante}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info/10 text-info">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-info/10 text-info">
                 <InboxIcon className="h-4 w-4" />
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">Pode Esperar</p>
-                <p className="text-lg font-bold text-info tabular-nums">{counts.podeEsperar}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">Pode Esperar</p>
+                <p className="text-base sm:text-lg font-bold text-info tabular-nums">{counts.podeEsperar}</p>
               </div>
             </div>
           </CardContent>
@@ -99,9 +99,9 @@ export function InboxView() {
       </div>
 
       {/* Filter */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full sm:w-[200px]">
             <Filter className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
             <SelectValue />
           </SelectTrigger>
@@ -199,7 +199,7 @@ export function InboxView() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
                       {item.processoId && (
                         <Button
                           variant="outline"
@@ -227,7 +227,7 @@ export function InboxView() {
                         <Sparkles className="h-3 w-3" />
                         Perguntar à IA
                       </Button>
-                      <div className="ml-auto flex items-center gap-1">
+                      <div className="sm:ml-auto flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"

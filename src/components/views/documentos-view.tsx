@@ -67,7 +67,7 @@ export function DocumentosView() {
       {/* Header */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -77,7 +77,7 @@ export function DocumentosView() {
                 className="pl-10"
               />
             </div>
-            <Button className="gap-1.5" onClick={() => setShowUpload(true)}>
+            <Button className="gap-1.5 w-full sm:w-auto" onClick={() => setShowUpload(true)}>
               <Upload className="h-4 w-4" />
               Analisar documento
             </Button>
@@ -128,7 +128,7 @@ export function DocumentosView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{d.nome}</p>
-                    <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5 text-xs text-muted-foreground">
                       <span>{d.tipo}</span>
                       <span>·</span>
                       <span>{d.tamanho}</span>
@@ -301,10 +301,10 @@ function MiniStat({
 }) {
   return (
     <Card>
-      <CardContent className="p-3 flex items-center gap-3">
+      <CardContent className="p-3 flex items-center gap-2.5">
         <div
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-lg",
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
             color === "primary" && "bg-primary/10 text-primary",
             color === "success" && "bg-success/10 text-success",
             color === "warning" && "bg-warning/15 text-warning",
@@ -313,9 +313,9 @@ function MiniStat({
         >
           <Icon className="h-4 w-4" />
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
-          <p className="text-lg font-bold tabular-nums leading-tight">{value}</p>
+        <div className="min-w-0">
+          <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground truncate">{label}</p>
+          <p className="text-base sm:text-lg font-bold tabular-nums leading-tight">{value}</p>
         </div>
       </CardContent>
     </Card>

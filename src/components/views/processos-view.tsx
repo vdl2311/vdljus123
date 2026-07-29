@@ -224,19 +224,19 @@ export function ProcessosView() {
       {/* Barra de busca + filtros */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="flex flex-col gap-3">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por número CNJ, cliente, parte, assunto, tag..."
                 value={processoSearch}
                 onChange={(e) => setProcessoSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-full"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full">
               <Select value={processoStatusFilter} onValueChange={setProcessoStatusFilter}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-full sm:w-[130px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -249,7 +249,7 @@ export function ProcessosView() {
                 </SelectContent>
               </Select>
               <Select value={processoAreaFilter} onValueChange={setProcessoAreaFilter}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-full sm:w-[130px]">
                   <SelectValue placeholder="Área" />
                 </SelectTrigger>
                 <SelectContent>
@@ -263,7 +263,7 @@ export function ProcessosView() {
               </Select>
               <Button
                 variant="outline"
-                className="gap-1.5 border-primary/30 hover:bg-primary/5 text-primary"
+                className="w-full sm:w-auto gap-1.5 border-primary/30 hover:bg-primary/5 text-primary text-xs h-9"
                 onClick={sincronizarTodosComDataJud}
                 disabled={syncingDataJud}
               >
@@ -272,15 +272,15 @@ export function ProcessosView() {
                 ) : (
                   <Database className="h-4 w-4 text-primary" />
                 )}
-                <span className="hidden sm:inline">
-                  {syncingDataJud ? "Sincronizando DataJud..." : "Sincronizar DataJud"}
+                <span>
+                  {syncingDataJud ? "Sincronizando..." : "Sincronizar DataJud"}
                 </span>
               </Button>
               <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
                 <DialogTrigger asChild>
-                  <Button className="gap-1.5">
+                  <Button className="w-full sm:w-auto gap-1.5 text-xs h-9">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Novo Processo</span>
+                    <span>Novo Processo</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[560px]">

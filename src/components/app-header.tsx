@@ -128,11 +128,13 @@ import { Mail, LogIn } from "lucide-react";
 export function AppHeader() {
   const { currentView, setCommandPaletteOpen, notificacoes, marcarNotificacaoLida, marcarTodasNotificacoesLidas, setView, logout, user } =
     useAppStore();
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
+
+  const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
 
   const info = viewTitles[currentView] || viewTitles.dashboard;
   const naoLidas = notificacoes.filter((n) => !n.lida).length;
@@ -152,14 +154,14 @@ export function AppHeader() {
       <div className="flex h-16 items-center gap-3 px-4 md:px-6 pl-16 md:pl-6">
         {/* Title & Breadcrumb */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
             <span>VDL Juris</span>
             <span>/</span>
             <span className="font-medium text-foreground">
               {currentView === "dashboard" ? "Dashboard" : info.title}
             </span>
           </div>
-          <h1 className="text-base md:text-lg font-semibold leading-tight truncate">
+          <h1 className="text-sm sm:text-base md:text-lg font-semibold leading-tight truncate">
             {dynamicInfo.title}
           </h1>
           <p className="text-xs text-muted-foreground truncate hidden sm:block">
@@ -192,11 +194,11 @@ export function AppHeader() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() => setTheme(isDark ? "light" : "dark")}
           aria-label="Alternar tema"
         >
-          {mounted && theme === "dark" ? (
-            <Sun className="h-5 w-5" />
+          {isDark ? (
+            <Sun className="h-5 w-5 text-amber-500" />
           ) : (
             <Moon className="h-5 w-5" />
           )}

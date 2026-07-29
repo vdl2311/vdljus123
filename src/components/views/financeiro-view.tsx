@@ -258,12 +258,12 @@ export function FinanceiroView() {
         {/* Lançamentos */}
         <Card className="lg:col-span-2">
           <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-base font-semibold">Lançamentos</CardTitle>
                 <CardDescription className="text-xs">{lancamentos.length} lançamento(s)</CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Select value={filtro} onValueChange={(v) => setFiltro(v as any)}>
                   <SelectTrigger className="w-[120px] h-8 text-xs">
                     <Filter className="h-3 w-3 mr-1" />
@@ -322,12 +322,12 @@ export function FinanceiroView() {
                             {isReceita ? "+" : "−"} {formatCurrency(l.valor)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1 text-xs text-muted-foreground">
                           <Badge variant="outline" className="text-xs">{l.tipo}</Badge>
                           <span>{l.categoria}</span>
                           {l.clienteNome && <span>· {l.clienteNome}</span>}
                         </div>
-                        <div className="flex items-center gap-2 mt-1.5">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Calendar className="h-2.5 w-2.5" />
                             {format(date, "dd/MM/yyyy")}
