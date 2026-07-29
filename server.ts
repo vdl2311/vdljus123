@@ -7,6 +7,14 @@ async function startServer() {
   const app = express();
   app.use(express.json({ limit: "25mb" }));
 
+  // Normalize URL path so both /api/... and /... work seamlessly
+  app.use((req, _res, next) => {
+    if (req.url && !req.url.startsWith("/api")) {
+      req.url = "/api" + req.url;
+    }
+    next();
+  });
+
   const PORT = 3000;
 
   // Lazy Gemini instance helper

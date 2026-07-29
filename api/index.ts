@@ -4,6 +4,14 @@ import { GoogleGenAI } from "@google/genai";
 const app = express();
 app.use(express.json({ limit: "25mb" }));
 
+// Normalize URL path so both /api/... and /... work seamlessly on Vercel
+app.use((req, _res, next) => {
+  if (req.url && !req.url.startsWith("/api")) {
+    req.url = "/api" + req.url;
+  }
+  next();
+});
+
 // Lazy Gemini instance helper
 const getAi = () => {
   const apiKey = process.env.GEMINI_API_KEY;
