@@ -32,6 +32,7 @@ import { toast } from "sonner";
 
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthorizedEmailsManager } from "@/components/auth/authorized-emails-manager";
+import { DataJudDiagnosticPanel } from "@/components/datajud/datajud-diagnostic-panel";
 import { Mail, KeyRound } from "lucide-react";
 
 export function ConfiguracoesView() {
@@ -377,6 +378,9 @@ export function ConfiguracoesView() {
             ))}
           </CardContent>
         </Card>
+
+        {/* Diagnostic Panel DataJud */}
+        <DataJudDiagnosticPanel />
 
         {/* Modo do Sistema & Dados Reais */}
         <Card className="border-destructive/30 bg-destructive/5">

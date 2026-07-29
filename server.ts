@@ -370,6 +370,149 @@ Retorne um JSON válido com o formato:
     }
   });
 
+  // GET /api/datajud/diagnostic - Painel Diagnóstico DataJud
+  app.get("/api/datajud/diagnostic", async (req, res) => {
+    const startTime = Date.now();
+    const testCnj = (req.query.cnj as string) || "1002345-12.2024.8.26.0100";
+    const logs: Array<{ id: string; timestamp: string; level: "info" | "warning" | "error"; message: string; details?: any }> = [];
+
+    logs.push({
+      id: `log-init-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      level: "info",
+      message: `Iniciando verificação diagnóstica em tempo real para DataJud (CNJ: ${testCnj})...`,
+    });
+
+    const apiKeyPresent = Boolean(process.env.DATAJUD_API_KEY);
+    logs.push({
+      id: `log-key-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      level: apiKeyPresent ? "info" : "warning",
+      message: apiKeyPresent
+        ? "Chave oficial de API do DataJud (DATAJUD_API_KEY) detectada no ambiente."
+        : "Operando via Barramento Público CNJ com Parser de Estrutura Judiciária.",
+    });
+
+    try {
+      const cleanCnj = testCnj.replace(/\D/g, "");
+      const isCnjValid = cleanCnj.length === 20;
+
+      if (!isCnjValid) {
+        logs.push({
+          id: `log-cnj-err-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: "error",
+          message: `CNJ fornecido não possui os 20 dígitos padrão da Resolução CNJ 65/2008 (${cleanCnj.length} dígitos).`,
+        });
+      }
+
+      // Executa teste interno de consulta
+      const fetchStart = Date.now();
+      const internalRes = await fetch(`http://127.0.0.1:3000/api/datajud/consulta`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numeroCnj: testCnj }),
+      });
+      const latency = Date.now() - fetchStart;
+
+      if (!internalRes.ok) {
+        logs.push({
+          id: `log-err-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: "error",
+          message: `Falha na consulta do CNJ de teste (${internalRes.status}).`,
+        });
+        return res.json({
+          status: "error",
+          latencyMs: latency,
+          apiKeyConfigured: apiKeyPresent,
+          gatewayMode: apiKeyPresent ? "API Direta CNJ" : "Barramento Público & Parser CNJ",
+          lastSyncTimestamp: new Date().toISOString(),
+          subjectMappingStatus: "error",
+          logs,
+        });
+      }
+
+      const data = await internalRes.json();
+
+      // Validação do Mapeamento do Assunto (Subject Mapping)
+      let subjectStatus: "valid" | "warning" | "error" = "valid";
+      let subjectMessage = "";
+
+      if (!data.assunto || typeof data.assunto !== "string" || data.assunto.trim() === "") {
+        subjectStatus = "error";
+        subjectMessage = "Erro no mapeamento de assunto: O campo 'assunto' retornou vazio ou indefinido.";
+        logs.push({
+          id: `log-subj-err-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: "error",
+          message: subjectMessage,
+          details: { rawPayload: data },
+        });
+      } else if (data.assunto.toLowerCase().includes("desconhecido") || data.assunto.toLowerCase().includes("não informado")) {
+        subjectStatus = "warning";
+        subjectMessage = `Aviso no mapeamento de assunto: Retornou valor genérico ("${data.assunto}").`;
+        logs.push({
+          id: `log-subj-warn-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: "warning",
+          message: subjectMessage,
+          details: { assunto: data.assunto },
+        });
+      } else {
+        logs.push({
+          id: `log-subj-ok-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: "info",
+          message: `Mapeamento de assunto validado com sucesso: "${data.assunto}" (${data.classe} - ${data.tribunal}).`,
+          details: { assunto: data.assunto, classe: data.classe, tribunal: data.tribunal },
+        });
+      }
+
+      logs.push({
+        id: `log-finish-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        level: "info",
+        message: `Diagnóstico concluído em ${latency}ms. Status: ${subjectStatus === "error" ? "ERRO" : "OPERACIONAL"}.`,
+      });
+
+      return res.json({
+        status: subjectStatus === "error" ? "degraded" : "operational",
+        latencyMs: latency,
+        apiKeyConfigured: apiKeyPresent,
+        gatewayMode: apiKeyPresent ? "API Direta CNJ" : "Barramento Público & Parser CNJ",
+        lastSyncTimestamp: new Date().toISOString(),
+        subjectMappingStatus: subjectStatus,
+        sampleTest: {
+          cnj: testCnj,
+          tribunal: data.tribunal,
+          classe: data.classe,
+          assunto: data.assunto,
+          subjectMappedCorrectly: subjectStatus === "valid",
+        },
+        logs,
+      });
+    } catch (err: any) {
+      const latency = Date.now() - startTime;
+      logs.push({
+        id: `log-exc-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        level: "error",
+        message: `Exceção durante diagnóstico: ${err.message || "Erro de servidor"}`,
+      });
+
+      return res.json({
+        status: "error",
+        latencyMs: latency,
+        apiKeyConfigured: apiKeyPresent,
+        gatewayMode: "Erro",
+        lastSyncTimestamp: new Date().toISOString(),
+        subjectMappingStatus: "error",
+        logs,
+      });
+    }
+  });
+
   // POST /api/datajud/consulta
   app.post("/api/datajud/consulta", async (req, res) => {
     try {
