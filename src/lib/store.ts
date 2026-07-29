@@ -113,6 +113,36 @@ import { onAuthStateChanged } from "firebase/auth";
 import { logger } from "./logger";
 import { toast } from "sonner";
 
+const STORAGE_KEYS = {
+  PROCESSOS: "vdl_juris_processos_v2",
+  CLIENTES: "vdl_juris_clientes_v2",
+  TAREFAS: "vdl_juris_tarefas_v2",
+  DOCUMENTOS: "vdl_juris_documentos_v2",
+};
+
+function getLocal<T>(key: string, fallback: T): T {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setLocal<T>(key: string, data: T) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.error("Error saving to localStorage", e);
+  }
+}
+
+function cleanForFirestore<T>(data: T): T {
+  return JSON.parse(
+    JSON.stringify(data, (_, value) => (value === undefined ? null : value))
+  );
+}
+
 let firebaseInitialized = false;
 
 const initialAuthorizedEmails = [
@@ -138,10 +168,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   commandPaletteOpen: false,
   aiPanelOpen: false,
 
-  processos: seedProcessos,
-  clientes: seedClientes,
-  tarefas: seedTarefas,
-  documentos: seedDocumentos,
+  processos: getLocal(STORAGE_KEYS.PROCESSOS, seedProcessos),
+  clientes: getLocal(STORAGE_KEYS.CLIENTES, seedClientes),
+  tarefas: getLocal(STORAGE_KEYS.TAREFAS, seedTarefas),
+  documentos: getLocal(STORAGE_KEYS.DOCUMENTOS, seedDocumentos),
   inbox: seedInbox,
   notificacoes: seedNotificacoes,
   chatMessages: [],
@@ -165,66 +195,99 @@ export const useAppStore = create<AppState>((set, get) => ({
   setProcessoAreaFilter: (s) => set({ processoAreaFilter: s }),
 
   addProcesso: async (p) => {
-    // Optimistic update
-    set((s) => ({ processos: [p, ...s.processos] }));
+    const cleanP = cleanForFirestore(p);
+    set((s) => {
+      const filtered = s.processos.filter((existing) => existing.id !== cleanP.id);
+      const updated = [cleanP, ...filtered];
+      setLocal(STORAGE_KEYS.PROCESSOS, updated);
+      return { processos: updated };
+    });
+
     try {
-      await setDoc(doc(db, "processos", p.id), p);
-      logger.action("Processo criado", { id: p.id, numeroCnj: p.numeroCnj });
+      await setDoc(doc(db, "processos", cleanP.id), cleanP);
+      logger.action("Processo criado no Firestore", { id: cleanP.id, numeroCnj: cleanP.numeroCnj });
     } catch (error) {
-      logger.error("system", "Erro ao criar processo", error);
+      logger.error("system", "Erro ao salvar processo no Firestore", error);
     }
   },
   updateProcesso: async (id, patch) => {
-    set((s) => ({
-      processos: s.processos.map((p) =>
-        p.id === id ? { ...p, ...patch } : p
-      ),
-    }));
+    const cleanPatch = cleanForFirestore(patch);
+    set((s) => {
+      const updated = s.processos.map((p) =>
+        p.id === id ? { ...p, ...cleanPatch } : p
+      );
+      setLocal(STORAGE_KEYS.PROCESSOS, updated);
+      return { processos: updated };
+    });
+
     try {
-      await updateDoc(doc(db, "processos", id), patch as any);
-      logger.action("Processo atualizado", { id, patch });
+      await updateDoc(doc(db, "processos", id), cleanPatch as any);
+      logger.action("Processo atualizado no Firestore", { id, patch: cleanPatch });
     } catch (error) {
-      logger.error("system", "Erro ao atualizar processo", error);
+      logger.error("system", "Erro ao atualizar processo no Firestore", error);
     }
   },
   addCliente: async (c) => {
-    set((s) => ({ clientes: [c, ...s.clientes] }));
+    const cleanC = cleanForFirestore(c);
+    set((s) => {
+      const filtered = s.clientes.filter((existing) => existing.id !== cleanC.id);
+      const updated = [cleanC, ...filtered];
+      setLocal(STORAGE_KEYS.CLIENTES, updated);
+      return { clientes: updated };
+    });
+
     try {
-      await setDoc(doc(db, "clientes", c.id), c);
-      logger.action("Cliente criado", { id: c.id, nome: c.nome });
+      await setDoc(doc(db, "clientes", cleanC.id), cleanC);
+      logger.action("Cliente criado no Firestore", { id: cleanC.id, nome: cleanC.nome });
     } catch (error) {
-      logger.error("system", "Erro ao criar cliente", error);
+      logger.error("system", "Erro ao criar cliente no Firestore", error);
     }
   },
   addTarefa: async (t) => {
-    set((s) => ({ tarefas: [t, ...s.tarefas] }));
+    const cleanT = cleanForFirestore(t);
+    set((s) => {
+      const filtered = s.tarefas.filter((existing) => existing.id !== cleanT.id);
+      const updated = [cleanT, ...filtered];
+      setLocal(STORAGE_KEYS.TAREFAS, updated);
+      return { tarefas: updated };
+    });
+
     try {
-      await setDoc(doc(db, "tarefas", t.id), t);
-      logger.action("Tarefa criada", { id: t.id, descricao: t.descricao });
+      await setDoc(doc(db, "tarefas", cleanT.id), cleanT);
+      logger.action("Tarefa criada no Firestore", { id: cleanT.id, descricao: cleanT.descricao });
     } catch (error) {
-      logger.error("system", "Erro ao criar tarefa", error);
+      logger.error("system", "Erro ao criar tarefa no Firestore", error);
     }
   },
   updateTarefa: async (id, patch) => {
-    set((s) => ({
-      tarefas: s.tarefas.map((t) =>
-        t.id === id ? { ...t, ...patch } : t
-      ),
-    }));
+    const cleanPatch = cleanForFirestore(patch);
+    set((s) => {
+      const updated = s.tarefas.map((t) =>
+        t.id === id ? { ...t, ...cleanPatch } : t
+      );
+      setLocal(STORAGE_KEYS.TAREFAS, updated);
+      return { tarefas: updated };
+    });
+
     try {
-      await updateDoc(doc(db, "tarefas", id), patch as any);
-      logger.action("Tarefa atualizada", { id, patch });
+      await updateDoc(doc(db, "tarefas", id), cleanPatch as any);
+      logger.action("Tarefa atualizada no Firestore", { id, patch: cleanPatch });
     } catch (error) {
-      logger.error("system", "Erro ao atualizar tarefa", error);
+      logger.error("system", "Erro ao atualizar tarefa no Firestore", error);
     }
   },
   removeTarefa: async (id) => {
-    set((s) => ({ tarefas: s.tarefas.filter((t) => t.id !== id) }));
+    set((s) => {
+      const updated = s.tarefas.filter((t) => t.id !== id);
+      setLocal(STORAGE_KEYS.TAREFAS, updated);
+      return { tarefas: updated };
+    });
+
     try {
       await deleteDoc(doc(db, "tarefas", id));
-      logger.action("Tarefa removida", { id });
+      logger.action("Tarefa removida no Firestore", { id });
     } catch (error) {
-      logger.error("system", "Erro ao remover tarefa", error);
+      logger.error("system", "Erro ao remover tarefa no Firestore", error);
     }
   },
   marcarInboxLido: (id) =>
@@ -451,6 +514,92 @@ export const useAppStore = create<AppState>((set, get) => ({
       logger.warn("auth", "Notice listening to authorized emails", e);
     }
 
+    // Set up collection listeners independently of auth state to ensure real-time persistence
+    try {
+      // Listen to Processos
+      onSnapshot(
+        collection(db, "processos"),
+        (snapshot) => {
+          const firestoreProcessos = snapshot.docs.map((doc) => doc.data() as Processo);
+          if (firestoreProcessos.length > 0) {
+            set((s) => {
+              const map = new Map<string, Processo>();
+              // Keep local state
+              s.processos.forEach((p) => map.set(p.id, p));
+              // Merge/overwrite with Firestore data
+              firestoreProcessos.forEach((p) => map.set(p.id, p));
+              const merged = Array.from(map.values()).sort((a, b) => b.id.localeCompare(a.id));
+              setLocal(STORAGE_KEYS.PROCESSOS, merged);
+              return { processos: merged };
+            });
+          } else {
+            // Seed Firestore with local processes if empty
+            const current = get().processos;
+            current.forEach((p) => {
+              setDoc(doc(db, "processos", p.id), cleanForFirestore(p)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on processos snapshot", error);
+        }
+      );
+
+      // Listen to Clientes
+      onSnapshot(
+        collection(db, "clientes"),
+        (snapshot) => {
+          const firestoreClientes = snapshot.docs.map((doc) => doc.data() as Cliente);
+          if (firestoreClientes.length > 0) {
+            set((s) => {
+              const map = new Map<string, Cliente>();
+              s.clientes.forEach((c) => map.set(c.id, c));
+              firestoreClientes.forEach((c) => map.set(c.id, c));
+              const merged = Array.from(map.values()).sort((a, b) => b.id.localeCompare(a.id));
+              setLocal(STORAGE_KEYS.CLIENTES, merged);
+              return { clientes: merged };
+            });
+          } else {
+            const current = get().clientes;
+            current.forEach((c) => {
+              setDoc(doc(db, "clientes", c.id), cleanForFirestore(c)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on clientes snapshot", error);
+        }
+      );
+
+      // Listen to Tarefas
+      onSnapshot(
+        collection(db, "tarefas"),
+        (snapshot) => {
+          const firestoreTarefas = snapshot.docs.map((doc) => doc.data() as Tarefa);
+          if (firestoreTarefas.length > 0) {
+            set((s) => {
+              const map = new Map<string, Tarefa>();
+              s.tarefas.forEach((t) => map.set(t.id, t));
+              firestoreTarefas.forEach((t) => map.set(t.id, t));
+              const merged = Array.from(map.values()).sort((a, b) => b.id.localeCompare(a.id));
+              setLocal(STORAGE_KEYS.TAREFAS, merged);
+              return { tarefas: merged };
+            });
+          } else {
+            const current = get().tarefas;
+            current.forEach((t) => {
+              setDoc(doc(db, "tarefas", t.id), cleanForFirestore(t)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on tarefas snapshot", error);
+        }
+      );
+    } catch (e) {
+      logger.warn("system", "Error setting up collection listeners", e);
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         set({ user: null, authError: null });
@@ -465,58 +614,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
 
       set({ user, authError: null });
-
-      try {
-        // Listen to Processos
-        onSnapshot(
-          collection(db, "processos"),
-          (snapshot) => {
-            const processosData = snapshot.docs.map((doc) => doc.data() as Processo).sort((a, b) => b.id.localeCompare(a.id));
-            if (processosData.length > 0) {
-              set({ processos: processosData });
-            } else {
-              seedProcessos.forEach((p) => setDoc(doc(db, "processos", p.id), p).catch(() => {}));
-            }
-          },
-          (error) => {
-            logger.warn("system", "Firestore info on processos snapshot", error);
-          }
-        );
-
-        // Listen to Clientes
-        onSnapshot(
-          collection(db, "clientes"),
-          (snapshot) => {
-            const clientesData = snapshot.docs.map((doc) => doc.data() as Cliente).sort((a, b) => b.id.localeCompare(a.id));
-            if (clientesData.length > 0) {
-              set({ clientes: clientesData });
-            } else {
-              seedClientes.forEach((c) => setDoc(doc(db, "clientes", c.id), c).catch(() => {}));
-            }
-          },
-          (error) => {
-            logger.warn("system", "Firestore info on clientes snapshot", error);
-          }
-        );
-
-        // Listen to Tarefas
-        onSnapshot(
-          collection(db, "tarefas"),
-          (snapshot) => {
-            const tarefasData = snapshot.docs.map((doc) => doc.data() as Tarefa).sort((a, b) => b.id.localeCompare(a.id));
-            if (tarefasData.length > 0) {
-              set({ tarefas: tarefasData });
-            } else {
-              seedTarefas.forEach((t) => setDoc(doc(db, "tarefas", t.id), t).catch(() => {}));
-            }
-          },
-          (error) => {
-            logger.warn("system", "Firestore info on tarefas snapshot", error);
-          }
-        );
-      } catch (e) {
-        logger.warn("system", "Firebase fetch info", e);
-      }
     });
   },
 }));

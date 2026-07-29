@@ -37,6 +37,7 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { JurisprudenciaSkeleton } from "@/components/skeleton";
 
 const tendenciaConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; label: string }> = {
   "Favorável": { icon: ThumbsUp, color: "text-success", bg: "bg-success/10", label: "Favorável" },
@@ -50,6 +51,12 @@ export function JurisprudenciaView() {
   const [explicando, setExplicando] = React.useState<string | null>(null);
   const [explicacao, setExplicacao] = React.useState<Record<string, any>>({});
   const { setAiPanelOpen } = useAppStore();
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   const areas = ["todas", ...Array.from(new Set(jurisprudencias.map((j) => j.area)))];
 
@@ -91,6 +98,10 @@ export function JurisprudenciaView() {
     } finally {
       setExplicando(null);
     }
+  }
+
+  if (loading) {
+    return <JurisprudenciaSkeleton />;
   }
 
   return (

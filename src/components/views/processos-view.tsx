@@ -47,6 +47,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { datajudService } from "@/lib/datajudService";
 
+import { ProcessosSkeleton } from "@/components/skeleton";
+
 const areas: ProcessoArea[] = [
   "Trabalhista",
   "Cível",
@@ -93,6 +95,12 @@ export function ProcessosView() {
   const [datajudResult, setDatajudResult] = React.useState<any>(null);
   const [cnjInput, setCnjInput] = React.useState("");
   const [viewMode, setViewMode] = React.useState<"list" | "kanban">("list");
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filtered = React.useMemo(() => {
     return processos.filter((p) => {
@@ -209,6 +217,10 @@ export function ProcessosView() {
     setShowNewDialog(false);
     setDatajudResult(null);
     setCnjInput("");
+  }
+
+  if (loading) {
+    return <ProcessosSkeleton />;
   }
 
   return (

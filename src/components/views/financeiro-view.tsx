@@ -40,6 +40,7 @@ import { format, parseISO, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { FinanceiroSkeleton } from "@/components/skeleton";
 import {
   AreaChart,
   Area,
@@ -65,6 +66,12 @@ const statusConfig: Record<string, { color: string; bg: string; label: string }>
 export function FinanceiroView() {
   const [filtro, setFiltro] = React.useState<"todos" | "Receita" | "Despesa" | "Honorário" | "Custa">("todos");
   const [statusFiltro, setStatusFiltro] = React.useState("todos");
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   const lancamentos = React.useMemo(() => {
     return lancamentosFinanceiros
@@ -102,6 +109,10 @@ export function FinanceiroView() {
       fill: tipo === "Honorário" ? "var(--primary)" : tipo === "Receita" ? "var(--chart-2)" : tipo === "Despesa" ? "var(--chart-4)" : "var(--chart-5)",
     }));
   })();
+
+  if (loading) {
+    return <FinanceiroSkeleton />;
+  }
 
   return (
     <div className="space-y-4">
