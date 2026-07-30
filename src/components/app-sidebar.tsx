@@ -25,6 +25,11 @@ import {
   TrendingUp,
   Globe,
   UserCog,
+  AlarmClock,
+  ShieldCheck,
+  Library,
+  FileSignature,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
@@ -82,6 +87,36 @@ export function AppSidebar() {
       label: "Tarefas",
       icon: CheckSquare,
       badge: tarefasPendentes,
+      group: "principal",
+    },
+    {
+      key: "prazos",
+      label: "Controle de Prazos",
+      icon: AlarmClock,
+      group: "principal",
+    },
+    {
+      key: "conflito-interesse",
+      label: "Conflito de Interesses",
+      icon: Scale,
+      group: "principal",
+    },
+    {
+      key: "compliance",
+      label: "Compliance & LGPD",
+      icon: ShieldCheck,
+      group: "principal",
+    },
+    {
+      key: "contratos",
+      label: "Modelos & Contratos",
+      icon: FileSignature,
+      group: "principal",
+    },
+    {
+      key: "conhecimento",
+      label: "Base de Conhecimento",
+      icon: Library,
       group: "principal",
     },
     {

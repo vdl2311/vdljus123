@@ -24,6 +24,11 @@ import { MapaProcessosView } from "@/components/views/mapa-processos-view";
 import { JurisprudenciaView } from "@/components/views/jurisprudencia-view";
 import { EstrategicoView } from "@/components/views/estrategico-view";
 import { EquipeView } from "@/components/views/equipe-view";
+import { ConflitoInteresseView } from "@/components/views/conflito-interesse-view";
+import { ComplianceView } from "@/components/views/compliance-view";
+import { ContratosView } from "@/components/views/contratos-view";
+import { ConhecimentoView } from "@/components/views/conhecimento-view";
+import { PrazosView } from "@/components/views/prazos-view";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { useAppStore } from "@/lib/store";
@@ -90,6 +95,16 @@ export default function App() {
         return <PortalClienteView />;
       case "configuracoes":
         return <ConfiguracoesView />;
+      case "conflito-interesse":
+        return <ConflitoInteresseView />;
+      case "compliance":
+        return <ComplianceView />;
+      case "contratos":
+        return <ContratosView />;
+      case "conhecimento":
+        return <ConhecimentoView />;
+      case "prazos":
+        return <PrazosView />;
       default:
         return <DashboardView />;
     }

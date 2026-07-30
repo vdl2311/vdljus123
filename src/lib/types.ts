@@ -78,7 +78,12 @@ export type ViewKey =
   | "mapa-processos"
   | "notificacoes"
   | "portal-cliente"
-  | "configuracoes";
+  | "configuracoes"
+  | "conflito-interesse"
+  | "compliance"
+  | "contratos"
+  | "conhecimento"
+  | "prazos";
 
 export interface UserProfile {
   id: string;
