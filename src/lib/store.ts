@@ -155,8 +155,15 @@ const initialAuthorizedEmails = [
   "joao.silva@jurisflow.com.br",
 ];
 
+const defaultDemoUser = {
+  uid: "u-admin-001",
+  email: "advogado@jurisflow.com.br",
+  displayName: "Advogado Administrador",
+  oab: "OAB: UF000000",
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
-  user: null,
+  user: defaultDemoUser,
   setUser: (user) => set({ user }),
   authError: null,
   setAuthError: (authError) => set({ authError }),
@@ -706,20 +713,24 @@ export const useAppStore = create<AppState>((set, get) => ({
       logger.warn("system", "Error setting up collection listeners", e);
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        set({ user: null, authError: null });
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        // Only clear if user explicitly logged out (user is null in store)
+        const currentUser = get().user;
+        if (currentUser === null) {
+          set({ user: null, authError: null });
+        }
         return;
       }
 
-      const email = user.email?.toLowerCase() || "";
+      const email = firebaseUser.email?.toLowerCase() || "";
       const authorizedList = get().emailsAutorizados;
 
       if (email && !authorizedList.some((e) => e.toLowerCase() === email)) {
         set({ emailsAutorizados: [...authorizedList, email] });
       }
 
-      set({ user, authError: null });
+      set({ user: firebaseUser, authError: null });
     });
   },
 }));

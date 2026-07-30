@@ -44,8 +44,8 @@ const tipoConfig: Record<string, { color: string; bg: string; icon: React.Compon
 };
 
 export function CalendarioView() {
-  const [currentDate, setCurrentDate] = React.useState(new Date(2026, 6, 27)); // 27/07/2026
-  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date(2026, 6, 27));
+  const [currentDate, setCurrentDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
   const [filtroTipo, setFiltroTipo] = React.useState<string>("todos");
   const { openProcesso } = useAppStore();
 
@@ -67,13 +67,13 @@ export function CalendarioView() {
 
   const eventosSelecionados = eventosDoDia(selectedDate).sort((a, b) => a.hora.localeCompare(b.hora));
 
-  // Próximos eventos (próximos 7 dias)
+  // Próximos eventos
   const proximosEventos = eventos
     .filter((e) => {
       const date = parseISO(e.data);
-      const today = new Date(2026, 6, 27);
-      const diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-      return diff >= 0 && diff <= 14;
+      const today = new Date();
+      // Allow relative matching or any upcoming events
+      return date.getTime() >= today.getTime() - 86400000;
     })
     .sort((a, b) => a.data.localeCompare(b.data))
     .slice(0, 8);

@@ -140,10 +140,13 @@ export function TarefasView() {
                     onShiftLeft={() => shiftStatus(t.id, t.status, "left")}
                     onShiftRight={() => shiftStatus(t.id, t.status, "right")}
                     onDelete={() => {
-                      if (window.confirm("Remover esta tarefa?")) {
-                        removeTarefa(t.id);
-                        toast.success("Tarefa excluída");
-                      }
+                      removeTarefa(t.id);
+                      toast.success("Tarefa removida do Kanban", {
+                        action: {
+                          label: "Desfazer",
+                          onClick: () => addTarefa(t),
+                        },
+                      });
                     }}
                   />
                 ))}
@@ -216,9 +219,11 @@ function TarefaKanbanCard({
           {/* Title & Description */}
           <div>
             <h4 className="text-xs font-bold text-foreground leading-snug">{tarefa.descricao}</h4>
-            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-              Minutar peça processual/diligência interna para prosseguimento do caso.
-            </p>
+            {tarefa.categoria && (
+              <span className="inline-block mt-1 text-[10px] text-muted-foreground font-medium bg-muted/50 px-1.5 py-0.5 rounded border border-border/40">
+                {tarefa.categoria}
+              </span>
+            )}
           </div>
 
           {/* Linked Process Badge if exists */}
@@ -300,8 +305,9 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
       </DialogHeader>
       <div className="space-y-3 py-2">
         <div className="space-y-1">
-          <Label className="text-xs font-semibold">Descrição / Título da Tarefa</Label>
+          <Label htmlFor="tarefa-descricao" className="text-xs font-semibold">Descrição / Título da Tarefa</Label>
           <Input
+            id="tarefa-descricao"
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
             placeholder="Ex: Redigir Petição Inicial de Divórcio"
@@ -311,8 +317,9 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs font-semibold">Data Limite</Label>
+            <Label htmlFor="tarefa-data-limite" className="text-xs font-semibold">Data Limite</Label>
             <Input
+              id="tarefa-data-limite"
               type="date"
               value={dataLimite}
               onChange={(e) => setDataLimite(e.target.value)}
@@ -321,8 +328,9 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-xs font-semibold">Prioridade</Label>
+            <Label htmlFor="tarefa-prioridade" className="text-xs font-semibold">Prioridade</Label>
             <select
+              id="tarefa-prioridade"
               value={prioridade}
               onChange={(e) => setPrioridade(e.target.value as any)}
               className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
@@ -336,8 +344,9 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs font-semibold">Advogado / Responsável</Label>
+          <Label htmlFor="tarefa-responsavel" className="text-xs font-semibold">Advogado / Responsável</Label>
           <Input
+            id="tarefa-responsavel"
             value={responsavelNome}
             onChange={(e) => setResponsavelNome(e.target.value)}
             placeholder="Ex: Dra. Letícia Antunes"
@@ -346,8 +355,9 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs font-semibold">Vincular Processo CNJ (Opcional)</Label>
+          <Label htmlFor="tarefa-processo" className="text-xs font-semibold">Vincular Processo CNJ (Opcional)</Label>
           <select
+            id="tarefa-processo"
             value={processoId}
             onChange={(e) => setProcessoId(e.target.value)}
             className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"

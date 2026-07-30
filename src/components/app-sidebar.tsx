@@ -14,6 +14,7 @@ import {
   UserCircle,
   Settings,
   Scale,
+  Gavel,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -98,7 +99,7 @@ export function AppSidebar() {
     {
       key: "conflito-interesse",
       label: "Conflito de Interesses",
-      icon: Scale,
+      icon: AlertTriangle,
       group: "principal",
     },
     {
@@ -171,7 +172,7 @@ export function AppSidebar() {
     {
       key: "jurisprudencia",
       label: "Jurisprudência IA",
-      icon: Scale,
+      icon: Gavel,
       group: "inteligencia",
     },
     {
@@ -229,6 +230,9 @@ export function AppSidebar() {
           <div
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de Navegação Principal"
           >
             <aside
               className="absolute left-0 top-0 h-full w-[280px] bg-sidebar border-r border-sidebar-border shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-left duration-200"

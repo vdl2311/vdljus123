@@ -394,8 +394,9 @@ export function ProcessosView() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-left">
                         {/* 1. Número CNJ */}
                         <div className="space-y-1 md:col-span-2">
-                          <Label className="text-xs font-semibold">Número CNJ do Processo (20 dígitos)</Label>
+                          <Label htmlFor="manual-cnj" className="text-xs font-semibold">Número CNJ do Processo (20 dígitos)</Label>
                           <Input
+                            id="manual-cnj"
                             placeholder="Ex: 5001234-56.2025.8.26.0100"
                             value={numeroCnjForm}
                             onChange={(e) => setNumeroCnjForm(e.target.value)}
@@ -405,8 +406,9 @@ export function ProcessosView() {
 
                         {/* 2. Título de Acompanhamento */}
                         <div className="space-y-1 md:col-span-2">
-                          <Label className="text-xs font-semibold">Título de Acompanhamento</Label>
+                          <Label htmlFor="manual-titulo" className="text-xs font-semibold">Título de Acompanhamento</Label>
                           <Input
+                            id="manual-titulo"
                             placeholder="Ex: Revisional de Alimentos / Cobrança Indevida"
                             value={tituloAcompanhamento}
                             onChange={(e) => setTituloAcompanhamento(e.target.value)}
@@ -416,8 +418,9 @@ export function ProcessosView() {
 
                         {/* 3. Cliente Vinculado */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Cliente Vinculado</Label>
+                          <Label htmlFor="manual-cliente" className="text-xs font-semibold">Cliente Vinculado</Label>
                           <select
+                            id="manual-cliente"
                             value={clienteIdForm}
                             onChange={(e) => setClienteIdForm(e.target.value)}
                             className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
@@ -433,8 +436,9 @@ export function ProcessosView() {
 
                         {/* 4. Área do Direito */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Área do Direito</Label>
+                          <Label htmlFor="manual-area" className="text-xs font-semibold">Área do Direito</Label>
                           <select
+                            id="manual-area"
                             value={areaForm}
                             onChange={(e) => setAreaForm(e.target.value as any)}
                             className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
@@ -451,8 +455,9 @@ export function ProcessosView() {
 
                         {/* 5. Análise de Risco */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Análise de Risco</Label>
+                          <Label htmlFor="manual-risco" className="text-xs font-semibold">Análise de Risco</Label>
                           <select
+                            id="manual-risco"
                             value={riscoForm}
                             onChange={(e) => setRiscoForm(e.target.value as any)}
                             className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
@@ -465,8 +470,9 @@ export function ProcessosView() {
 
                         {/* 6. Valor da Causa */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Valor da Causa (R$)</Label>
+                          <Label htmlFor="manual-valor" className="text-xs font-semibold">Valor da Causa (R$)</Label>
                           <Input
+                            id="manual-valor"
                             placeholder="Ex: 50000"
                             value={valorCausaForm}
                             onChange={(e) => setValorCausaForm(e.target.value)}
@@ -476,8 +482,9 @@ export function ProcessosView() {
 
                         {/* 7. Tribunal (Sigla) */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Tribunal (Sigla)</Label>
+                          <Label htmlFor="manual-tribunal" className="text-xs font-semibold">Tribunal (Sigla)</Label>
                           <Input
+                            id="manual-tribunal"
                             placeholder="Ex: TJSP / TRT2 / TRF3"
                             value={tribunalForm}
                             onChange={(e) => setTribunalForm(e.target.value)}
@@ -487,8 +494,9 @@ export function ProcessosView() {
 
                         {/* 8. Vara de Distribuição */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Vara de Distribuição</Label>
+                          <Label htmlFor="manual-vara" className="text-xs font-semibold">Vara de Distribuição</Label>
                           <Input
+                            id="manual-vara"
                             placeholder="Ex: 12ª Vara Cível Federal"
                             value={varaForm}
                             onChange={(e) => setVaraForm(e.target.value)}
@@ -498,8 +506,9 @@ export function ProcessosView() {
 
                         {/* 9. Classe Processual */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Classe Processual</Label>
+                          <Label htmlFor="manual-classe" className="text-xs font-semibold">Classe Processual</Label>
                           <Input
+                            id="manual-classe"
                             placeholder="Ex: Monitória / Mandado de Segurança"
                             value={classeForm}
                             onChange={(e) => setClasseForm(e.target.value)}
@@ -509,8 +518,9 @@ export function ProcessosView() {
 
                         {/* 10. Assunto do Litígio */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Assunto do Litígio</Label>
+                          <Label htmlFor="manual-assunto" className="text-xs font-semibold">Assunto do Litígio</Label>
                           <Input
+                            id="manual-assunto"
                             placeholder="Ex: Repetição de Indébito / ISS"
                             value={assuntoForm}
                             onChange={(e) => setAssuntoForm(e.target.value)}
@@ -520,8 +530,9 @@ export function ProcessosView() {
 
                         {/* 11. Polo Ativo */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Polo Ativo (Autor)</Label>
+                          <Label htmlFor="manual-polo-ativo" className="text-xs font-semibold">Polo Ativo (Autor)</Label>
                           <Input
+                            id="manual-polo-ativo"
                             placeholder="Ex: Mariana Costa Neves"
                             value={poloAtivoForm}
                             onChange={(e) => setPoloAtivoForm(e.target.value)}
@@ -531,8 +542,9 @@ export function ProcessosView() {
 
                         {/* 12. Polo Passivo */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-semibold">Polo Passivo (Réu)</Label>
+                          <Label htmlFor="manual-polo-passivo" className="text-xs font-semibold">Polo Passivo (Réu)</Label>
                           <Input
+                            id="manual-polo-passivo"
                             placeholder="Ex: Banco X S.A."
                             value={poloPassivoForm}
                             onChange={(e) => setPoloPassivoForm(e.target.value)}
