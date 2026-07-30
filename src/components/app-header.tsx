@@ -10,12 +10,20 @@ import {
   Command as CommandIcon,
   Zap,
   Settings,
+  Key,
+  Download,
+  ExternalLink,
+  Mail,
+  LogIn,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { ApiKeyModal } from "@/components/api-key-modal";
+import { exportAllDataToExcel } from "@/lib/data-exporter";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -123,14 +131,14 @@ const viewTitles: Record<string, { title: string; subtitle: string }> = {
 };
 
 import { AuthModal } from "@/components/auth/auth-modal";
-import { Mail, LogIn } from "lucide-react";
 
 export function AppHeader() {
-  const { currentView, setCommandPaletteOpen, notificacoes, marcarNotificacaoLida, marcarTodasNotificacoesLidas, setView, logout, user } =
+  const { currentView, setCommandPaletteOpen, notificacoes, marcarNotificacaoLida, marcarTodasNotificacoesLidas, setView, logout, user, processos, clientes, tarefas, documentos } =
     useAppStore();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
 
@@ -149,21 +157,34 @@ export function AppHeader() {
     title: currentView === "dashboard" ? `Bom dia, ${firstName}` : info.title,
   };
 
+  const handleExportAll = () => {
+    exportAllDataToExcel({
+      officeName: "VDL Juris Advocacia",
+      processos,
+      clientes,
+      tarefas,
+      documentos,
+    });
+    toast.success("Backup integral exportado com sucesso em Excel!");
+  };
+
   return (
     <header className="sticky top-0 z-30 glass border-b border-border">
       <div className="flex h-16 items-center gap-3 px-4 md:px-6 pl-16 md:pl-6">
-        {/* Title & Breadcrumb */}
-        <div className="flex-1 min-w-0">
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
-            <span>VDL Juris</span>
-            <span>/</span>
-            <span className="font-medium text-foreground">
-              {currentView === "dashboard" ? "Dashboard" : info.title}
+        {/* Title & Badges */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-foreground truncate">
+              {dynamicInfo.title}
+            </h1>
+            <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted/50 border-border font-mono py-0 px-1.5 h-5">
+              v2.4.0 Live
+            </Badge>
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Sincronizado
             </span>
           </div>
-          <h1 className="text-sm sm:text-base md:text-lg font-semibold leading-tight truncate">
-            {dynamicInfo.title}
-          </h1>
           <p className="text-xs text-muted-foreground truncate hidden sm:block">
             {dynamicInfo.subtitle}
           </p>
@@ -172,14 +193,36 @@ export function AppHeader() {
         {/* Search trigger */}
         <button
           onClick={() => setCommandPaletteOpen(true)}
-          className="hidden md:flex items-center gap-2 h-9 px-3 w-[280px] rounded-lg border border-input bg-muted/40 text-sm text-muted-foreground hover:bg-muted transition-colors"
+          className="hidden md:flex items-center gap-2 h-8 px-3 w-[200px] lg:w-[240px] rounded-lg border border-input bg-muted/40 text-xs text-muted-foreground hover:bg-muted transition-colors"
         >
-          <Search className="h-4 w-4" />
-          <span className="flex-1 text-left">Buscar ou pedir à IA...</span>
-          <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-background text-xs font-mono">
-            <CommandIcon className="h-3 w-3" />K
+          <Search className="h-3.5 w-3.5" />
+          <span className="flex-1 text-left truncate">Buscar ou pedir à IA...</span>
+          <kbd className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded border border-border bg-background text-[10px] font-mono">
+            <CommandIcon className="h-2.5 w-2.5" />K
           </kbd>
         </button>
+
+        {/* Chaves IA Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowApiKeyModal(true)}
+          className="hidden xl:inline-flex gap-1.5 text-xs border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 font-medium h-8"
+        >
+          <Key className="h-3.5 w-3.5" />
+          Chaves IA
+        </Button>
+
+        {/* Exportar Dados Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportAll}
+          className="hidden xl:inline-flex gap-1.5 text-xs border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 font-medium h-8"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Exportar Dados
+        </Button>
 
         <Button
           variant="ghost"
@@ -344,6 +387,7 @@ export function AppHeader() {
         </DropdownMenu>
 
         <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+        <ApiKeyModal open={showApiKeyModal} onOpenChange={setShowApiKeyModal} />
       </div>
     </header>
   );

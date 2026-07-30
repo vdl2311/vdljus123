@@ -79,6 +79,7 @@ const fasesList: ProcessoFase[] = [
 export function ProcessosView() {
   const {
     processos,
+    clientes,
     processoSearch,
     processoStatusFilter,
     processoAreaFilter,
@@ -97,6 +98,80 @@ export function ProcessosView() {
   const [cnjInput, setCnjInput] = React.useState("");
   const [viewMode, setViewMode] = React.useState<"list" | "kanban">("list");
   const [loading, setLoading] = React.useState(false);
+
+  // Manual Form States (Matching Screenshot 2)
+  const [numeroCnjForm, setNumeroCnjForm] = React.useState("");
+  const [tituloAcompanhamento, setTituloAcompanhamento] = React.useState("");
+  const [clienteIdForm, setClienteIdForm] = React.useState("");
+  const [areaForm, setAreaForm] = React.useState<ProcessoArea>("Cível");
+  const [riscoForm, setRiscoForm] = React.useState<ProcessoRisco>("Baixo");
+  const [valorCausaForm, setValorCausaForm] = React.useState("");
+  const [tribunalForm, setTribunalForm] = React.useState("");
+  const [varaForm, setVaraForm] = React.useState("");
+  const [classeForm, setClasseForm] = React.useState("");
+  const [assuntoForm, setAssuntoForm] = React.useState("");
+  const [poloAtivoForm, setPoloAtivoForm] = React.useState("");
+  const [poloPassivoForm, setPoloPassivoForm] = React.useState("");
+
+  function salvarProcessoManual() {
+    if (!numeroCnjForm || !assuntoForm) {
+      toast.error("Preencha o Número CNJ e o Assunto do Litígio");
+      return;
+    }
+    const clienteObj = clientes.find((c) => c.id === clienteIdForm);
+    const novo: Processo = {
+      id: `p-${Date.now()}`,
+      numeroCnj: numeroCnjForm,
+      tribunal: tribunalForm || "TJSP",
+      comarca: varaForm || "São Paulo",
+      classeProcessual: classeForm || "Procedimento Comum Cível",
+      assunto: assuntoForm || tituloAcompanhamento || "Ação Cível",
+      area: areaForm,
+      risco: riscoForm,
+      partes: {
+        poloAtivo: poloAtivoForm || "Autor Desconhecido",
+        poloPassivo: poloPassivoForm || "Réu Desconhecido",
+      },
+      advogadoResponsavelId: user?.uid || "u-001",
+      advogadoResponsavelNome: user?.displayName || "Advogado(a)",
+      clienteId: clienteIdForm || "c-001",
+      clienteNome: clienteObj?.nome || "Cliente Cadastrado",
+      status: "Ativo",
+      fase: "Petição Inicial",
+      movimentacoes: [
+        {
+          id: `m-${Date.now()}`,
+          data: new Date().toISOString(),
+          descricao: "Processo cadastrado manualmente na plataforma JusFlow.",
+          orgao: varaForm || tribunalForm || "Secretaria Unificada",
+          fonte: "Manual",
+          relevancia: "Alta",
+        },
+      ],
+      documentosIds: [],
+      tags: [areaForm.toLowerCase(), "manual"],
+      datasImportantes: {
+        distribuicao: new Date().toISOString().split("T")[0],
+      },
+      valorCausa: parseFloat(valorCausaForm) || 10000,
+      ultimaSincronizacaoDataJud: new Date().toISOString(),
+    };
+
+    addProcesso(novo);
+    toast.success("Processo judicial cadastrado com sucesso!");
+    setShowNewDialog(false);
+    // Reset form
+    setNumeroCnjForm("");
+    setTituloAcompanhamento("");
+    setClienteIdForm("");
+    setValorCausaForm("");
+    setTribunalForm("");
+    setVaraForm("");
+    setClasseForm("");
+    setAssuntoForm("");
+    setPoloAtivoForm("");
+    setPoloPassivoForm("");
+  }
 
   const filtered = React.useMemo(() => {
     return (processos || []).filter((p) => {
@@ -287,83 +362,262 @@ export function ProcessosView() {
               </Button>
               <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
                 <DialogTrigger asChild>
-                  <Button className="w-full sm:w-auto gap-1.5 text-xs h-9">
+                  <Button className="w-full sm:w-auto gap-1.5 text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                     <Plus className="h-4 w-4" />
                     <span>Novo Processo</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[560px]">
-                  <DialogHeader>
-                    <DialogTitle>Importar processo do DataJud</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="cnj">Número CNJ</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="cnj"
-                          mask="cnj"
-                          placeholder="0000000-00.0000.0.00.0000"
-                          value={cnjInput}
-                          onChange={(e) => setCnjInput(e.target.value)}
-                        />
-                        <Button onClick={consultarDataJud} disabled={datajudLoading}>
-                          {datajudLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Database className="h-4 w-4" />
-                          )}
-                          Consultar
-                        </Button>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Formato: NNNNNNN-DD.AAAA.J.TR.OOOO · Ex: 0012345-67.2023.5.02.0001
+                <DialogContent className="sm:max-w-[680px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader className="flex flex-row items-start justify-between border-b border-border pb-3">
+                    <div>
+                      <DialogTitle className="text-base font-bold text-foreground">
+                        Cadastrar Novo Processo Judicial
+                      </DialogTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Crie a vinculação à OAB, clientes e configure os tribunais.
                       </p>
                     </div>
+                  </DialogHeader>
 
-                    {datajudResult && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        className="rounded-lg border border-success/30 bg-success/5 p-3 space-y-2"
-                      >
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-success" />
-                          <span className="text-sm font-medium">Processo encontrado</span>
+                  <Tabs defaultValue="manual" className="w-full mt-2">
+                    <TabsList className="grid w-full grid-cols-2 h-9 mb-4">
+                      <TabsTrigger value="manual" className="text-xs font-semibold">
+                        Formulário Completo (Manual)
+                      </TabsTrigger>
+                      <TabsTrigger value="datajud" className="text-xs font-semibold">
+                        Importar via DataJud (CNJ)
+                      </TabsTrigger>
+                    </TabsList>
+
+                    {/* Tab 1: Manual Form (Exact match to Screenshot 2) */}
+                    <TabsContent value="manual" className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-left">
+                        {/* 1. Número CNJ */}
+                        <div className="space-y-1 md:col-span-2">
+                          <Label className="text-xs font-semibold">Número CNJ do Processo (20 dígitos)</Label>
+                          <Input
+                            placeholder="Ex: 5001234-56.2025.8.26.0100"
+                            value={numeroCnjForm}
+                            onChange={(e) => setNumeroCnjForm(e.target.value)}
+                            className="text-xs font-mono"
+                          />
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-muted-foreground">Tribunal:</span>{" "}
-                            <strong>{datajudResult.tribunal}</strong>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Comarca:</span>{" "}
-                            <strong>{datajudResult.comarca}</strong>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Classe:</span>{" "}
-                            <strong>{datajudResult.classe}</strong>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Distribuição:</span>{" "}
-                            <strong>{formatDateSafe(datajudResult.dataDistribuicao)}</strong>
-                          </div>
-                          <div className="col-span-2">
-                            <span className="text-muted-foreground">Movimentações:</span>{" "}
-                            <strong>{datajudResult.movimentacoes.length} encontradas</strong>
-                          </div>
+
+                        {/* 2. Título de Acompanhamento */}
+                        <div className="space-y-1 md:col-span-2">
+                          <Label className="text-xs font-semibold">Título de Acompanhamento</Label>
+                          <Input
+                            placeholder="Ex: Revisional de Alimentos / Cobrança Indevida"
+                            value={tituloAcompanhamento}
+                            onChange={(e) => setTituloAcompanhamento(e.target.value)}
+                            className="text-xs"
+                          />
                         </div>
-                      </motion.div>
-                    )}
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowNewDialog(false)}>
-                      Cancelar
-                    </Button>
-                    <Button onClick={salvarNovo} disabled={!datajudResult}>
-                      Importar processo
-                    </Button>
-                  </DialogFooter>
+
+                        {/* 3. Cliente Vinculado */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Cliente Vinculado</Label>
+                          <select
+                            value={clienteIdForm}
+                            onChange={(e) => setClienteIdForm(e.target.value)}
+                            className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
+                          >
+                            <option value="">Selecione do CRM...</option>
+                            {clientes.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.nome} ({c.cpfCnpj})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* 4. Área do Direito */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Área do Direito</Label>
+                          <select
+                            value={areaForm}
+                            onChange={(e) => setAreaForm(e.target.value as any)}
+                            className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
+                          >
+                            <option value="Civil">Civil</option>
+                            <option value="Trabalhista">Trabalhista</option>
+                            <option value="Tributário">Tributário</option>
+                            <option value="Empresarial">Empresarial</option>
+                            <option value="Penal">Penal / Criminal</option>
+                            <option value="Previdenciário">Previdenciário</option>
+                            <option value="Família">Família</option>
+                          </select>
+                        </div>
+
+                        {/* 5. Análise de Risco */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Análise de Risco</Label>
+                          <select
+                            value={riscoForm}
+                            onChange={(e) => setRiscoForm(e.target.value as any)}
+                            className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
+                          >
+                            <option value="Baixo">Baixo (Alta probabilidade de êxito)</option>
+                            <option value="Médio">Médio (Risco moderado)</option>
+                            <option value="Alto">Alto (Risco elevado)</option>
+                          </select>
+                        </div>
+
+                        {/* 6. Valor da Causa */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Valor da Causa (R$)</Label>
+                          <Input
+                            placeholder="Ex: 50000"
+                            value={valorCausaForm}
+                            onChange={(e) => setValorCausaForm(e.target.value)}
+                            className="text-xs font-mono"
+                          />
+                        </div>
+
+                        {/* 7. Tribunal (Sigla) */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Tribunal (Sigla)</Label>
+                          <Input
+                            placeholder="Ex: TJSP / TRT2 / TRF3"
+                            value={tribunalForm}
+                            onChange={(e) => setTribunalForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+
+                        {/* 8. Vara de Distribuição */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Vara de Distribuição</Label>
+                          <Input
+                            placeholder="Ex: 12ª Vara Cível Federal"
+                            value={varaForm}
+                            onChange={(e) => setVaraForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+
+                        {/* 9. Classe Processual */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Classe Processual</Label>
+                          <Input
+                            placeholder="Ex: Monitória / Mandado de Segurança"
+                            value={classeForm}
+                            onChange={(e) => setClasseForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+
+                        {/* 10. Assunto do Litígio */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Assunto do Litígio</Label>
+                          <Input
+                            placeholder="Ex: Repetição de Indébito / ISS"
+                            value={assuntoForm}
+                            onChange={(e) => setAssuntoForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+
+                        {/* 11. Polo Ativo */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Polo Ativo (Autor)</Label>
+                          <Input
+                            placeholder="Ex: Mariana Costa Neves"
+                            value={poloAtivoForm}
+                            onChange={(e) => setPoloAtivoForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+
+                        {/* 12. Polo Passivo */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold">Polo Passivo (Réu)</Label>
+                          <Input
+                            placeholder="Ex: Banco X S.A."
+                            value={poloPassivoForm}
+                            onChange={(e) => setPoloPassivoForm(e.target.value)}
+                            className="text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <DialogFooter className="pt-3 border-t border-border">
+                        <Button variant="outline" onClick={() => setShowNewDialog(false)}>
+                          Cancelar
+                        </Button>
+                        <Button onClick={salvarProcessoManual} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-1.5">
+                          Cadastrar Processo Judicial
+                        </Button>
+                      </DialogFooter>
+                    </TabsContent>
+
+                    {/* Tab 2: DataJud Import */}
+                    <TabsContent value="datajud" className="space-y-4">
+                      <div className="space-y-2 text-left">
+                        <Label htmlFor="cnj">Número CNJ para Consulta</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="cnj"
+                            mask="cnj"
+                            placeholder="0000000-00.0000.0.00.0000"
+                            value={cnjInput}
+                            onChange={(e) => setCnjInput(e.target.value)}
+                          />
+                          <Button onClick={consultarDataJud} disabled={datajudLoading}>
+                            {datajudLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Database className="h-4 w-4" />
+                            )}
+                            Consultar
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Formato: NNNNNNN-DD.AAAA.J.TR.OOOO · Ex: 0012345-67.2023.5.02.0001
+                        </p>
+                      </div>
+
+                      {datajudResult && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="rounded-lg border border-success/30 bg-success/5 p-3 space-y-2 text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-success" />
+                            <span className="text-sm font-medium">Processo localizado</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                              <span className="text-muted-foreground">Tribunal:</span>{" "}
+                              <strong>{datajudResult.tribunal}</strong>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Comarca:</span>{" "}
+                              <strong>{datajudResult.comarca}</strong>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Classe:</span>{" "}
+                              <strong>{datajudResult.classe}</strong>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Distribuição:</span>{" "}
+                              <strong>{formatDateSafe(datajudResult.dataDistribuicao)}</strong>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowNewDialog(false)}>
+                          Cancelar
+                        </Button>
+                        <Button onClick={salvarNovo} disabled={!datajudResult}>
+                          Importar do DataJud
+                        </Button>
+                      </DialogFooter>
+                    </TabsContent>
+                  </Tabs>
                 </DialogContent>
               </Dialog>
             </div>

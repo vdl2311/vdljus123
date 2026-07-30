@@ -220,7 +220,7 @@ export interface Documento {
 }
 
 export type TarefaPrioridade = "Urgente" | "Alta" | "Média" | "Baixa";
-export type TarefaStatus = "Pendente" | "Em Andamento" | "Concluído" | "Atrasado";
+export type TarefaStatus = "Pendente" | "Em Andamento" | "Em Revisão" | "Concluído" | "Atrasado";
 export type TarefaCategoria = "Prazo Processual" | "Audiência" | "Diligência" | "Reunião" | "Interno";
 
 export interface Tarefa {

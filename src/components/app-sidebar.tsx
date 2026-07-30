@@ -236,10 +236,13 @@ export function AppSidebar() {
             >
               <div className="flex items-center justify-between px-4 h-14 border-b border-sidebar-border shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
                     <Scale className="h-4 w-4" />
                   </div>
-                  <span className="font-bold text-base">VDL Juris</span>
+                  <div>
+                    <span className="font-bold text-base leading-tight block">JusFlow</span>
+                    <span className="text-[10px] text-muted-foreground block">Plataforma Jurídica</span>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -313,16 +316,16 @@ function SidebarContent({
       {/* Header do Menu */}
       <div className="flex items-center justify-between px-3.5 h-16 border-b border-sidebar-border shrink-0">
         <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-glow">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md">
             <Scale className="h-5 w-5" />
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-none overflow-hidden">
-              <span className="font-bold text-[15px] tracking-tight truncate">
-                VDL Juris
+              <span className="font-bold text-[15px] tracking-tight truncate text-foreground">
+                JusFlow
               </span>
-              <span className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">
-                v2 · 2026
+              <span className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
+                Plataforma Jurídica
               </span>
             </div>
           )}

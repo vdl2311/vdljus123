@@ -8,8 +8,11 @@ import {
   CheckCircle2,
   Calendar,
   Briefcase,
-  MoreHorizontal,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Scale,
+  User,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,53 +22,24 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/lib/store";
 import type { Tarefa, TarefaPrioridade, TarefaStatus, TarefaCategoria } from "@/lib/types";
 import { format, differenceInDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const colunas: { status: TarefaStatus; titulo: string; color: string }[] = [
-  { status: "Pendente", titulo: "Pendente", color: "bg-muted-foreground" },
-  { status: "Em Andamento", titulo: "Em Andamento", color: "bg-info" },
-  { status: "Concluído", titulo: "Concluído", color: "bg-success" },
-  { status: "Atrasado", titulo: "Atrasado", color: "bg-destructive" },
-];
-
-const prioridades: TarefaPrioridade[] = ["Urgente", "Alta", "Média", "Baixa"];
-const categorias: TarefaCategoria[] = [
-  "Prazo Processual",
-  "Audiência",
-  "Diligência",
-  "Reunião",
-  "Interno",
+const colunas: { status: TarefaStatus; titulo: string; dotColor: string }[] = [
+  { status: "Pendente", titulo: "A FAZER", dotColor: "bg-slate-500" },
+  { status: "Em Andamento", titulo: "EM ANDAMENTO", dotColor: "bg-amber-500" },
+  { status: "Em Revisão", titulo: "EM REVISÃO", dotColor: "bg-purple-500" },
+  { status: "Concluído", titulo: "CONCLUÍDA", dotColor: "bg-emerald-500" },
 ];
 
 export function TarefasView() {
@@ -73,22 +47,17 @@ export function TarefasView() {
   const [showNew, setShowNew] = React.useState(false);
   const [draggingId, setDraggingId] = React.useState<string | null>(null);
 
+  const activeCount = tarefas.filter((t) => t.status !== "Concluído").length;
+
   const grouped = React.useMemo(() => {
-    return colunas.map((c) => ({
-      ...c,
-      tarefas: tarefas
+    return colunas.map((col) => ({
+      ...col,
+      list: tarefas
         .filter((t) => {
-          // Tarefa pendente com data passada vira atrasada visualmente
-          if (c.status === "Atrasado") {
-            return t.status === "Atrasado" ||
-              (t.status === "Pendente" &&
-                differenceInDays(new Date(t.dataLimite), new Date()) < 0);
+          if (col.status === "Pendente") {
+            return t.status === "Pendente" || t.status === "Atrasado";
           }
-          if (c.status === "Pendente") {
-            return t.status === "Pendente" &&
-              differenceInDays(new Date(t.dataLimite), new Date()) >= 0;
-          }
-          return t.status === c.status;
+          return t.status === col.status;
         })
         .sort((a, b) => new Date(a.dataLimite).getTime() - new Date(b.dataLimite).getTime()),
     }));
@@ -98,89 +67,91 @@ export function TarefasView() {
     if (!draggingId) return;
     updateTarefa(draggingId, { status: targetStatus });
     setDraggingId(null);
-    toast.success("Tarefa movida");
+    toast.success("Tarefa reposicionada no Kanban");
   }
+
+  const shiftStatus = (id: string, currentStatus: TarefaStatus, direction: "left" | "right") => {
+    const statuses: TarefaStatus[] = ["Pendente", "Em Andamento", "Em Revisão", "Concluído"];
+    let idx = statuses.indexOf(currentStatus === "Atrasado" ? "Pendente" : currentStatus);
+    if (idx === -1) idx = 0;
+    const newIdx = direction === "left" ? Math.max(0, idx - 1) : Math.min(statuses.length - 1, idx + 1);
+    updateTarefa(id, { status: statuses[newIdx] });
+    toast.success(`Status alterado para ${statuses[newIdx]}`);
+  };
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Quadro Kanban</p>
-              <p className="text-xs text-muted-foreground">
-                Arraste tarefas entre colunas para atualizar status
-              </p>
-            </div>
-            <Dialog open={showNew} onOpenChange={setShowNew}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5">
-                  <Plus className="h-4 w-4" />
-                  Nova tarefa
-                </Button>
-              </DialogTrigger>
-              <NovaTarefaDialog
-                onSave={(t) => {
-                  addTarefa(t);
-                  setShowNew(false);
-                  toast.success("Tarefa criada!");
-                }}
-              />
-            </Dialog>
+      {/* Subheader bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-foreground">Kanban da equipe</h2>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            <strong>{activeCount} tarefas ativas</strong> • Arraste entre colunas ou use as setas
+          </p>
+        </div>
 
-      {/* Kanban */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Dialog open={showNew} onOpenChange={setShowNew}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 rounded-full px-4 text-xs font-bold">
+              <Plus className="h-4 w-4" />
+              Nova tarefa
+            </Button>
+          </DialogTrigger>
+          <NovaTarefaDialog
+            onSave={(t) => {
+              addTarefa(t);
+              setShowNew(false);
+              toast.success("Nova tarefa adicionada!");
+            }}
+          />
+        </Dialog>
+      </div>
+
+      {/* Kanban Board */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {grouped.map((col) => (
           <div
             key={col.status}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(col.status)}
-            className="space-y-3"
+            className="flex flex-col rounded-xl bg-muted/30 border border-border/60 p-3 space-y-3 min-h-[500px]"
           >
-            <div className="flex items-center justify-between px-1">
+            {/* Column Header */}
+            <div className="flex items-center justify-between px-2 py-1 bg-background rounded-lg border border-border shadow-xs">
               <div className="flex items-center gap-2">
-                <span className={cn("h-2 w-2 rounded-full", col.color)} />
-                <h3 className="text-sm font-semibold">{col.titulo}</h3>
+                <span className={cn("h-2 w-2 rounded-full shrink-0", col.dotColor)} />
+                <h3 className="text-xs font-bold tracking-wider text-foreground">{col.titulo}</h3>
               </div>
-              <Badge variant="secondary" className="text-xs tabular-nums">
-                {col.tarefas.length}
-              </Badge>
+              <span className="flex items-center justify-center h-5 w-5 rounded-full bg-muted text-[11px] font-bold text-muted-foreground">
+                {col.list.length}
+              </span>
             </div>
 
-            <div className="space-y-2 min-h-[200px]">
+            {/* Column Cards */}
+            <div className="space-y-3 flex-1 overflow-y-auto">
               <AnimatePresence>
-                {col.tarefas.map((t) => (
-                  <TarefaCard
+                {col.list.map((t) => (
+                  <TarefaKanbanCard
                     key={t.id}
                     tarefa={t}
                     onDragStart={() => setDraggingId(t.id)}
-                    onAdvance={() => {
-                      const next: Record<TarefaStatus, TarefaStatus> = {
-                        Pendente: "Em Andamento",
-                        "Em Andamento": "Concluído",
-                        Concluído: "Concluído",
-                        Atrasado: "Em Andamento",
-                      };
-                      updateTarefa(t.id, { status: next[t.status] });
-                      toast.success("Status atualizado");
-                    }}
+                    onShiftLeft={() => shiftStatus(t.id, t.status, "left")}
+                    onShiftRight={() => shiftStatus(t.id, t.status, "right")}
                     onDelete={() => {
-                      if (window.confirm("Tem certeza que deseja remover esta tarefa?")) {
+                      if (window.confirm("Remover esta tarefa?")) {
                         removeTarefa(t.id);
-                        toast.success("Tarefa removida");
+                        toast.success("Tarefa excluída");
                       }
                     }}
                   />
                 ))}
               </AnimatePresence>
 
-              {col.tarefas.length === 0 && (
-                <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-                  Sem tarefas aqui
+              {col.list.length === 0 && (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+                  Sem tarefas nesta etapa
                 </div>
               )}
             </div>
@@ -191,89 +162,101 @@ export function TarefasView() {
   );
 }
 
-function TarefaCard({
+function TarefaKanbanCard({
   tarefa,
   onDragStart,
-  onAdvance,
+  onShiftLeft,
+  onShiftRight,
   onDelete,
 }: {
-  key?: React.Key;
   tarefa: Tarefa;
   onDragStart: () => void;
-  onAdvance: () => void;
+  onShiftLeft: () => void;
+  onShiftRight: () => void;
   onDelete: () => void;
 }) {
-  const date = new Date(tarefa.dataLimite);
-  const dias = differenceInDays(date, new Date());
+  const priorityClasses = {
+    Urgente: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30",
+    Alta: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30",
+    Média: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30",
+    Baixa: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30",
+  };
+
+  const initialLetter = (tarefa.responsavelNome || "Advogado")[0].toUpperCase();
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       draggable
       onDragStart={onDragStart}
-      className="cursor-move"
+      className="cursor-grab active:cursor-grabbing"
     >
-      <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
-        <CardContent className="p-3">
-          <div className="flex items-start justify-between gap-2 mb-2">
+      <Card className="hover:border-primary/40 transition-all shadow-xs border-border bg-background">
+        <CardContent className="p-3.5 space-y-2.5">
+          {/* Top Bar: Priority Pill & Delete */}
+          <div className="flex items-center justify-between">
             <Badge
               variant="outline"
-              className={cn(
-                "text-xs",
-                tarefa.prioridade === "Urgente" && "border-destructive/40 text-destructive",
-                tarefa.prioridade === "Alta" && "border-warning/40 text-warning",
-                tarefa.prioridade === "Média" && "border-info/40 text-info",
-                tarefa.prioridade === "Baixa" && "border-muted-foreground/40"
-              )}
+              className={cn("text-[10px] font-bold uppercase tracking-wider py-0 px-2 h-5", priorityClasses[tarefa.prioridade] || priorityClasses["Média"])}
             >
-              {tarefa.prioridade}
+              {tarefa.prioridade === "Urgente" ? "CRÍTICO" : tarefa.prioridade.toUpperCase()}
             </Badge>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground p-0.5">
-                  <MoreHorizontal className="h-3.5 w-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onClick={onAdvance}>
-                  <CheckCircle2 className="h-3.5 w-3.5 mr-2" /> Avançar status
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                  <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              onClick={onDelete}
+              className="text-muted-foreground/60 hover:text-destructive p-1 rounded transition-colors"
+              title="Excluir tarefa"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
           </div>
 
-          <p className="text-sm font-medium leading-snug mb-2">{tarefa.descricao}</p>
-
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            {format(date, "dd/MM", { locale: ptBR })}
-            <span className="ml-1">
-              {dias < 0 ? (
-                <span className="text-destructive font-medium">· {Math.abs(dias)}d atraso</span>
-              ) : dias === 0 ? (
-                <span className="text-warning font-medium">· vence hoje</span>
-              ) : (
-                <span>· em {dias}d</span>
-              )}
-            </span>
+          {/* Title & Description */}
+          <div>
+            <h4 className="text-xs font-bold text-foreground leading-snug">{tarefa.descricao}</h4>
+            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+              Minutar peça processual/diligência interna para prosseguimento do caso.
+            </p>
           </div>
 
+          {/* Linked Process Badge if exists */}
           {tarefa.processoNumeroCnj && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5 font-mono">
-              <Briefcase className="h-3 w-3" />
-              {tarefa.processoNumeroCnj.slice(0, 16)}...
+            <div className="p-1.5 bg-muted/50 border border-border/60 rounded text-[10px] font-medium text-muted-foreground flex items-center gap-1.5 truncate">
+              <Scale className="h-3 w-3 text-primary shrink-0" />
+              <span className="truncate">Proc: {tarefa.processoNumeroCnj}</span>
             </div>
           )}
 
-          <Badge variant="secondary" className="text-xs mt-2">
-            {tarefa.categoria}
-          </Badge>
+          {/* Bottom Bar: Responsible User & Navigation Arrows */}
+          <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center justify-center h-5 w-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] border border-emerald-500/20">
+                {initialLetter}
+              </div>
+              <span className="text-[11px] font-medium text-muted-foreground truncate max-w-[110px]">
+                {tarefa.responsavelNome}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <button
+                onClick={onShiftLeft}
+                className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                title="Mover para esquerda"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={onShiftRight}
+                className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                title="Mover para direita"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
@@ -284,13 +267,14 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
   const { processos, user } = useAppStore();
   const [descricao, setDescricao] = React.useState("");
   const [dataLimite, setDataLimite] = React.useState("");
-  const [prioridade, setPrioridade] = React.useState<TarefaPrioridade>("Média");
+  const [prioridade, setPrioridade] = React.useState<TarefaPrioridade>("Alta");
   const [categoria, setCategoria] = React.useState<TarefaCategoria>("Prazo Processual");
   const [processoId, setProcessoId] = React.useState("");
+  const [responsavelNome, setResponsavelNome] = React.useState("Dra. Letícia Antunes");
 
   function salvar() {
     if (!descricao || !dataLimite) {
-      toast.error("Preencha descrição e data limite");
+      toast.error("Preencha a descrição e a data limite");
       return;
     }
     const proc = processos.find((p) => p.id === processoId);
@@ -300,117 +284,88 @@ function NovaTarefaDialog({ onSave }: { onSave: (t: Tarefa) => void }) {
       processoId: processoId || undefined,
       processoNumeroCnj: proc?.numeroCnj,
       responsavelId: user?.uid || "u-001",
-      responsavelNome: user?.displayName || "Advogado(a)",
+      responsavelNome: responsavelNome || "Dra. Letícia Antunes",
       dataLimite,
       prioridade,
       status: "Pendente",
       categoria,
     };
     onSave(nova);
-    setDescricao("");
-    setDataLimite("");
-    setProcessoId("");
   }
 
   return (
-    <DialogContent className="sm:max-w-[520px]">
+    <DialogContent className="sm:max-w-[480px]">
       <DialogHeader>
-        <DialogTitle>Nova tarefa</DialogTitle>
+        <DialogTitle className="text-base font-bold">Cadastrar Nova Tarefa</DialogTitle>
       </DialogHeader>
-      <div className="grid gap-3 py-2">
-        <div className="grid gap-2">
-          <Label>Descrição</Label>
-          <Textarea
+      <div className="space-y-3 py-2">
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold">Descrição / Título da Tarefa</Label>
+          <Input
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
-            placeholder="Ex: Preparar contestação trabalhista..."
-            rows={3}
+            placeholder="Ex: Redigir Petição Inicial de Divórcio"
+            className="text-xs"
           />
         </div>
+
         <div className="grid grid-cols-2 gap-3">
-          <div className="grid gap-2">
-            <Label>Data limite</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !dataLimite && "text-muted-foreground"
-                  )}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {dataLimite ? format(parseISO(dataLimite), "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={dataLimite ? parseISO(dataLimite) : undefined}
-                  onSelect={(date) => {
-                    if (date) {
-                      setDataLimite(date.toISOString().split("T")[0]);
-                    } else {
-                      setDataLimite("");
-                    }
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Data Limite</Label>
+            <Input
+              type="date"
+              value={dataLimite}
+              onChange={(e) => setDataLimite(e.target.value)}
+              className="text-xs"
+            />
           </div>
-          <div className="grid gap-2">
-            <Label>Prioridade</Label>
-            <Select value={prioridade} onValueChange={(v) => setPrioridade(v as TarefaPrioridade)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {prioridades.map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {p}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Prioridade</Label>
+            <select
+              value={prioridade}
+              onChange={(e) => setPrioridade(e.target.value as any)}
+              className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
+            >
+              <option value="Urgente">Crítico / Urgente</option>
+              <option value="Alta">Alta</option>
+              <option value="Média">Média</option>
+              <option value="Baixa">Baixa</option>
+            </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="grid gap-2">
-            <Label>Categoria</Label>
-            <Select value={categoria} onValueChange={(v) => setCategoria(v as TarefaCategoria)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categorias.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label>Processo (opcional)</Label>
-            <Select value={processoId} onValueChange={setProcessoId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Nenhum" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60">
-                {processos.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    <span className="font-mono text-xs font-semibold mr-1">{p.numeroCnj.slice(0, 15)}...</span>
-                    <span className="text-muted-foreground text-xs font-normal">({p.clienteNome})</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold">Advogado / Responsável</Label>
+          <Input
+            value={responsavelNome}
+            onChange={(e) => setResponsavelNome(e.target.value)}
+            placeholder="Ex: Dra. Letícia Antunes"
+            className="text-xs"
+          />
         </div>
+
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold">Vincular Processo CNJ (Opcional)</Label>
+          <select
+            value={processoId}
+            onChange={(e) => setProcessoId(e.target.value)}
+            className="w-full bg-background border border-border rounded-md p-2 text-xs font-medium text-foreground focus:outline-none"
+          >
+            <option value="">Nenhum processo vinculado</option>
+            {processos.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.numeroCnj} - {p.assunto}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <Button onClick={salvar} className="w-full mt-2 gap-1.5">
+          <Plus className="h-4 w-4" />
+          Criar Tarefa no Kanban
+        </Button>
       </div>
-      <DialogFooter>
-        <Button onClick={salvar}>Criar tarefa</Button>
-      </DialogFooter>
     </DialogContent>
   );
 }
