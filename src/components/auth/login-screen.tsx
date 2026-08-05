@@ -200,10 +200,11 @@ export function LoginScreen() {
                 <TabsContent value="login" className="space-y-3.5">
                   <form onSubmit={handleLogin} className="space-y-3">
                     <div className="space-y-1.5">
-                      <Label className="text-xs">E-mail</Label>
+                      <Label htmlFor="login-email" className="text-xs">E-mail</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
+                          id="login-email"
                           type="email"
                           required
                           placeholder="seu.email@escritorio.com.br"
@@ -216,7 +217,7 @@ export function LoginScreen() {
 
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs">Senha</Label>
+                        <Label htmlFor="login-password" className="text-xs">Senha</Label>
                         <button
                           type="button"
                           onClick={() => setTab("recover")}
@@ -228,6 +229,7 @@ export function LoginScreen() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
+                          id="login-password"
                           type={showPassword ? "text" : "password"}
                           required
                           placeholder="••••••••"
@@ -255,10 +257,11 @@ export function LoginScreen() {
                 <TabsContent value="signup" className="space-y-3.5">
                   <form onSubmit={handleSignUp} className="space-y-3">
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Nome Completo</Label>
+                      <Label htmlFor="signup-nome" className="text-xs">Nome Completo</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
+                          id="signup-nome"
                           type="text"
                           required
                           placeholder="Dra. Mariana Vidal"
@@ -270,10 +273,11 @@ export function LoginScreen() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs">E-mail Autorizado</Label>
+                      <Label htmlFor="signup-email" className="text-xs">E-mail Autorizado</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
+                          id="signup-email"
                           type="email"
                           required
                           placeholder="seu.email@escritorio.com.br"
@@ -289,8 +293,9 @@ export function LoginScreen() {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Senha</Label>
+                        <Label htmlFor="signup-password" className="text-xs">Senha</Label>
                         <Input
+                          id="signup-password"
                           type="password"
                           required
                           placeholder="••••••••"
@@ -300,8 +305,9 @@ export function LoginScreen() {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Confirmar Senha</Label>
+                        <Label htmlFor="signup-confirm-password" className="text-xs">Confirmar Senha</Label>
                         <Input
+                          id="signup-confirm-password"
                           type="password"
                           required
                           placeholder="••••••••"

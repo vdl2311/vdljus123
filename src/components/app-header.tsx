@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ApiKeyModal } from "@/components/api-key-modal";
 import { exportAllDataToExcel } from "@/lib/data-exporter";
+import { getSaudacaoHorario } from "@/lib/format";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -45,7 +46,7 @@ import { ptBR } from "date-fns/locale";
 
 const viewTitles: Record<string, { title: string; subtitle: string }> = {
   dashboard: {
-    title: "Bom dia, Dra. Marina",
+    title: "Painel Principal",
     subtitle: "Aqui está o resumo da sua operação hoje.",
   },
   processos: {
@@ -151,10 +152,11 @@ export function AppHeader() {
   const displayName = user?.displayName || currentUser.nome;
   const email = user?.email || currentUser.email;
   const firstName = displayName.split(" ")[0] || "Advogado(a)";
+  const saudacao = getSaudacaoHorario();
 
   const dynamicInfo = {
     ...info,
-    title: currentView === "dashboard" ? `Bom dia, ${firstName}` : info.title,
+    title: currentView === "dashboard" ? `${saudacao}, ${firstName}` : info.title,
   };
 
   const handleExportAll = () => {
@@ -169,15 +171,15 @@ export function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-30 glass border-b border-border">
-      <div className="flex h-16 items-center gap-3 px-4 md:px-6 pl-16 md:pl-6">
+    <header className="sticky top-0 z-30 glass border-b border-border w-full max-w-full overflow-hidden">
+      <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-6 pl-14 md:pl-6 min-w-0 max-w-full">
         {/* Title & Badges */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-foreground truncate">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <h1 className="text-sm sm:text-lg font-bold leading-tight tracking-tight text-foreground truncate min-w-0">
               {dynamicInfo.title}
             </h1>
-            <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted/50 border-border font-mono py-0 px-1.5 h-5">
+            <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted/50 border-border font-mono py-0 px-1.5 h-4 sm:h-5 shrink-0">
               v2.4.0 Live
             </Badge>
             <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">

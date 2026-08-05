@@ -328,14 +328,14 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
       </DialogHeader>
       <div className="grid gap-3 py-2">
         <div className="grid gap-2">
-          <Label>Nome / Razão Social</Label>
-          <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: TechNova Soluções S/A" />
+          <Label htmlFor="cliente-nome">Nome / Razão Social</Label>
+          <Input id="cliente-nome" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: TechNova Soluções S/A" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
-            <Label>Tipo</Label>
+            <Label htmlFor="cliente-tipo">Tipo</Label>
             <Select value={tipo} onValueChange={(v) => setTipo(v as any)}>
-              <SelectTrigger>
+              <SelectTrigger id="cliente-tipo">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -345,24 +345,24 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label>CPF / CNPJ</Label>
-            <Input mask="cpf-cnpj" value={cpfCnpj} onChange={(e) => setCpfCnpj(e.target.value)} placeholder="00.000.000/0001-00" />
+            <Label htmlFor="cliente-cpf-cnpj">CPF / CNPJ</Label>
+            <Input id="cliente-cpf-cnpj" mask="cpf-cnpj" value={cpfCnpj} onChange={(e) => setCpfCnpj(e.target.value)} placeholder="00.000.000/0001-00" />
           </div>
         </div>
         <div className="grid gap-2">
-          <Label>E-mail</Label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="cliente@empresa.com.br" />
+          <Label htmlFor="cliente-email">E-mail</Label>
+          <Input id="cliente-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="cliente@empresa.com.br" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
-            <Label>Telefone</Label>
-            <Input mask="phone" value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(11) 99999-9999" />
+            <Label htmlFor="cliente-telefone">Telefone</Label>
+            <Input id="cliente-telefone" mask="phone" value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(11) 99999-9999" />
           </div>
           <div className="grid gap-2">
-            <Label>Cidade / UF</Label>
+            <Label htmlFor="cliente-cidade">Cidade / UF</Label>
             <div className="flex gap-2">
-              <Input value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder="São Paulo" />
-              <Input value={uf} onChange={(e) => setUf(e.target.value)} placeholder="SP" maxLength={2} className="w-16" />
+              <Input id="cliente-cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder="São Paulo" />
+              <Input id="cliente-uf" aria-label="UF" value={uf} onChange={(e) => setUf(e.target.value)} placeholder="SP" maxLength={2} className="w-16" />
             </div>
           </div>
         </div>

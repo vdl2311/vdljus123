@@ -178,3 +178,14 @@ export function formatCnpjCpf(value: string): string {
   return maskCpfCnpj(value);
 }
 
+export function getSaudacaoHorario(date: Date = new Date()): string {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) {
+    return "Bom dia";
+  } else if (hour >= 12 && hour < 18) {
+    return "Boa tarde";
+  } else {
+    return "Boa noite";
+  }
+}
+

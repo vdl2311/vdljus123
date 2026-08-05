@@ -142,10 +142,11 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <AppHeader />
 
-        <main className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6" id="main-content">
+        <main className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 md:p-6 min-w-0 max-w-full overflow-x-hidden" id="main-content">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
+              className="w-full max-w-full min-w-0"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -3 }}

@@ -538,7 +538,7 @@ export const documentos: Documento[] = [
     arquivoUrl: "/docs/modelo-contrato-2026.docx",
     tamanho: "340 KB",
     dataUpload: "2026-01-10",
-    resumoIa: "Modelo padrão de honorários com cláusulas de honorários sucumbenciais,EXIT e foro.",
+    resumoIa: "Modelo padrão de honorários com cláusulas de honorários sucumbenciais, EXIT e foro.",
     statusIa: "pendente",
   },
 ];
