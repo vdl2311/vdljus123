@@ -270,6 +270,7 @@ export function AppSidebar() {
                   setMobileOpen(false);
                 }}
                 collapsed={false}
+                hideHeader
               />
             </aside>
           </div>
@@ -304,6 +305,7 @@ interface SidebarContentProps {
   onSelect: (v: ViewKey) => void;
   onOpenAi: () => void;
   collapsed: boolean;
+  hideHeader?: boolean;
 }
 
 function SidebarContent({
@@ -312,42 +314,45 @@ function SidebarContent({
   onSelect,
   onOpenAi,
   collapsed,
+  hideHeader = false,
 }: SidebarContentProps) {
   const { toggleSidebar } = useAppStore();
 
   return (
     <div className="flex flex-col h-full min-h-0 w-full overflow-hidden">
       {/* Header do Menu */}
-      <div className="flex items-center justify-between px-3.5 h-16 border-b border-sidebar-border shrink-0">
-        <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md">
-            <Scale className="h-5 w-5" />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col leading-none overflow-hidden">
-              <span className="font-bold text-[15px] tracking-tight truncate text-foreground">
-                JusFlow
-              </span>
-              <span className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
-                Plataforma Jurídica
-              </span>
+      {!hideHeader && (
+        <div className="flex items-center justify-between px-3.5 h-16 border-b border-sidebar-border shrink-0">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md">
+              <Scale className="h-5 w-5" />
             </div>
-          )}
-        </div>
+            {!collapsed && (
+              <div className="flex flex-col leading-none overflow-hidden">
+                <span className="font-bold text-[15px] tracking-tight truncate text-foreground">
+                  JusFlow
+                </span>
+                <span className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
+                  Plataforma Jurídica
+                </span>
+              </div>
+            )}
+          </div>
 
-        <button
-          onClick={toggleSidebar}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-sidebar-accent shrink-0 ml-auto"
-          title={collapsed ? "Expandir menu" : "Recolher menu"}
-          aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </button>
-      </div>
+          <button
+            onClick={toggleSidebar}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-sidebar-accent shrink-0 ml-auto"
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+            aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Botão Copiloto */}
       <div className="px-3 pt-3 shrink-0">
