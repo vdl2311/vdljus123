@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/lib/store";
 import type { Cliente } from "@/lib/types";
+import { applyMask } from "@/lib/format";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion } from "framer-motion";
@@ -356,18 +357,37 @@ function cn(...args: any[]) {
 
 function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
   const [nome, setNome] = React.useState("");
-  const [tipo, setTipo] = React.useState<"PF" | "PJ">("PJ");
+  const [tipo, setTipo] = React.useState<"PF" | "PJ">("PF");
   const [cpfCnpj, setCpfCnpj] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [telefone, setTelefone] = React.useState("");
   const [cidade, setCidade] = React.useState("");
   const [uf, setUf] = React.useState("");
 
+  const handleTipoChange = (newTipo: "PF" | "PJ") => {
+    setTipo(newTipo);
+    if (cpfCnpj) {
+      const masked = applyMask(cpfCnpj, newTipo === "PF" ? "cpf" : "cnpj");
+      setCpfCnpj(masked);
+    }
+  };
+
   function salvar() {
     if (!nome || !cpfCnpj) {
-      toast.error("Preencha nome e CPF/CNPJ");
+      toast.error("Preencha nome e " + (tipo === "PF" ? "CPF" : "CNPJ"));
       return;
     }
+
+    const digits = cpfCnpj.replace(/\D/g, "");
+    if (tipo === "PF" && digits.length !== 11) {
+      toast.error("O CPF deve conter exatamente 11 dígitos");
+      return;
+    }
+    if (tipo === "PJ" && digits.length !== 14) {
+      toast.error("O CNPJ deve conter exatamente 14 dígitos");
+      return;
+    }
+
     const novo: Cliente = {
       id: `c-${Date.now()}`,
       nome,
@@ -387,6 +407,7 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
     setEmail("");
     setTelefone("");
     setCidade("");
+    setUf("");
   }
 
   return (
@@ -397,24 +418,31 @@ function NovoClienteDialog({ onSave }: { onSave: (c: Cliente) => void }) {
       <div className="grid gap-3 py-2">
         <div className="grid gap-2">
           <Label htmlFor="cliente-nome">Nome / Razão Social</Label>
-          <Input id="cliente-nome" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: TechNova Soluções S/A" />
+          <Input id="cliente-nome" value={nome} onChange={(e) => setNome(e.target.value)} placeholder={tipo === "PF" ? "Ex: Ana Silva" : "Ex: TechNova Soluções S/A"} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
             <Label htmlFor="cliente-tipo">Tipo</Label>
-            <Select value={tipo} onValueChange={(v) => setTipo(v as any)}>
+            <Select value={tipo} onValueChange={(v) => handleTipoChange(v as any)}>
               <SelectTrigger id="cliente-tipo">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
                 <SelectItem value="PF">Pessoa Física</SelectItem>
+                <SelectItem value="PJ">Pessoa Jurídica</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="cliente-cpf-cnpj">CPF / CNPJ</Label>
-            <Input id="cliente-cpf-cnpj" mask="cpf-cnpj" value={cpfCnpj} onChange={(e) => setCpfCnpj(e.target.value)} placeholder="00.000.000/0001-00" />
+            <Label htmlFor="cliente-cpf-cnpj">{tipo === "PF" ? "CPF" : "CNPJ"}</Label>
+            <Input
+              id="cliente-cpf-cnpj"
+              mask={tipo === "PF" ? "cpf" : "cnpj"}
+              maxLength={tipo === "PF" ? 14 : 18}
+              value={cpfCnpj}
+              onChange={(e) => setCpfCnpj(e.target.value)}
+              placeholder={tipo === "PF" ? "000.000.000-00" : "00.000.000/0001-00"}
+            />
           </div>
         </div>
         <div className="grid gap-2">
