@@ -20,10 +20,12 @@ import {
   Building2,
   Users,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -38,10 +40,26 @@ import { useTheme } from "next-themes";
 import { datajudService } from "@/lib/datajudService";
 
 export function ProcessoDetalheView() {
-  const { selectedProcessoId, processos, setView, setAiPanelOpen, updateProcesso } = useAppStore();
+  const { selectedProcessoId, processos, setView, setAiPanelOpen, updateProcesso, removeProcesso } = useAppStore();
   const processo = processos.find((p) => p.id === selectedProcessoId);
 
   const [syncing, setSyncing] = React.useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  async function handleDeleteProcesso() {
+    if (!processo) return;
+    setIsDeleting(true);
+    try {
+      await removeProcesso(processo.id);
+      toast.success(`Processo ${processo.numeroCnj || ""} excluído com sucesso!`);
+      setView("processos");
+    } catch (e) {
+      toast.error("Erro ao excluir processo.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   if (!processo) {
     return (
@@ -111,6 +129,15 @@ export function ProcessoDetalheView() {
           <Button size="sm" onClick={() => setAiPanelOpen(true)} className="gap-1.5">
             <Sparkles className="h-3.5 w-3.5" />
             Perguntar ao Copiloto
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setShowConfirmDelete(true)}
+            className="gap-1.5"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Excluir Processo
           </Button>
         </div>
       </div>
@@ -411,6 +438,45 @@ export function ProcessoDetalheView() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de confirmação de exclusão do processo */}
+      <Dialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Excluir Processo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground space-y-2">
+            <p>
+              Tem certeza que deseja excluir o processo <strong className="font-mono text-foreground">{processo.numeroCnj}</strong>?
+            </p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-md border border-amber-500/20">
+              Esta ação removerá o processo do sistema e do banco de dados do escritório.
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowConfirmDelete(false)}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteProcesso}
+              disabled={isDeleting}
+              className="gap-1.5"
+            >
+              {isDeleting ? "Excluindo..." : "Sim, Excluir Processo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

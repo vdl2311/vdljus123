@@ -15,6 +15,7 @@ import {
   ArrowUpDown,
   Tag,
   Calendar,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -693,129 +694,202 @@ function ProcessoCard({
   onOpen: () => void;
   index: number;
 }) {
+  const { removeProcesso } = useAppStore();
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   const prazoFatalDate = safeDate(processo.datasImportantes?.prazoFatal);
   const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
 
   const movimentacoesRecentes = (processo.movimentacoes || []).slice(0, 2);
 
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    setIsDeleting(true);
+    try {
+      await removeProcesso(processo.id);
+      toast.success(`Processo ${processo.numeroCnj || ""} excluído!`);
+    } catch (err) {
+      toast.error("Erro ao excluir processo");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.4) }}
-    >
-      <Card
-        className="cursor-pointer hover:shadow-elevated hover:border-primary/30 transition-all overflow-hidden"
-        onClick={onOpen}
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.4) }}
       >
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Avatar processo */}
-            <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-1.5 lg:min-w-[120px]">
-              <div
-                className={cn(
-                  "flex h-11 w-11 items-center justify-center rounded-xl font-bold text-xs",
-                  processo.risco === "Alto" && "bg-destructive/10 text-destructive",
-                  processo.risco === "Médio" && "bg-warning/15 text-warning",
-                  processo.risco === "Baixo" && "bg-success/10 text-success"
-                )}
-              >
-                {(processo.area || "Cível").slice(0, 3).toUpperCase()}
-              </div>
-              <div className="lg:hidden flex-1" />
-              <div className="hidden lg:block">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                  Risco
-                </p>
-                <p
+        <Card
+          className="cursor-pointer hover:shadow-elevated hover:border-primary/30 transition-all overflow-hidden relative group"
+          onClick={onOpen}
+        >
+          <CardContent className="p-4">
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Avatar processo */}
+              <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-1.5 lg:min-w-[120px]">
+                <div
                   className={cn(
-                    "text-sm font-bold",
-                    processo.risco === "Alto" && "text-destructive",
-                    processo.risco === "Médio" && "text-warning",
-                    processo.risco === "Baixo" && "text-success"
+                    "flex h-11 w-11 items-center justify-center rounded-xl font-bold text-xs",
+                    processo.risco === "Alto" && "bg-destructive/10 text-destructive",
+                    processo.risco === "Médio" && "bg-warning/15 text-warning",
+                    processo.risco === "Baixo" && "bg-success/10 text-success"
                   )}
                 >
-                  {processo.risco || "Médio"}
-                </p>
-              </div>
-            </div>
-
-            {/* Conteúdo principal */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="min-w-0">
-                  <p className="font-mono text-xs text-muted-foreground">{processo.numeroCnj}</p>
-                  <h3 className="font-semibold text-sm leading-tight mt-0.5 truncate">
-                    {processo.clienteNome || "Sem cliente"} · {processo.assunto || "Sem assunto"}
-                  </h3>
+                  {(processo.area || "Cível").slice(0, 3).toUpperCase()}
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Badge variant="outline" className="text-xs">
-                    {processo.status || "Ativo"}
-                  </Badge>
-                  {diasPrazo !== null && (
-                    <Badge
-                      variant={diasPrazo <= 7 ? "destructive" : diasPrazo <= 15 ? "secondary" : "outline"}
-                      className="text-xs"
+                <div className="lg:hidden flex-1" />
+                <div className="hidden lg:block">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                    Risco
+                  </p>
+                  <p
+                    className={cn(
+                      "text-sm font-bold",
+                      processo.risco === "Alto" && "text-destructive",
+                      processo.risco === "Médio" && "text-warning",
+                      processo.risco === "Baixo" && "text-success"
+                    )}
+                  >
+                    {processo.risco || "Médio"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Conteúdo principal */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0">
+                    <p className="font-mono text-xs text-muted-foreground">{processo.numeroCnj}</p>
+                    <h3 className="font-semibold text-sm leading-tight mt-0.5 truncate">
+                      {processo.clienteNome || "Sem cliente"} · {processo.assunto || "Sem assunto"}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Badge variant="outline" className="text-xs">
+                      {processo.status || "Ativo"}
+                    </Badge>
+                    {diasPrazo !== null && (
+                      <Badge
+                        variant={diasPrazo <= 7 ? "destructive" : diasPrazo <= 15 ? "secondary" : "outline"}
+                        className="text-xs"
+                      >
+                        <Clock className="h-3 w-3 mr-0.5" />
+                        {diasPrazo}d
+                      </Badge>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDeleteModal(true);
+                      }}
+                      title="Excluir processo"
                     >
-                      <Clock className="h-3 w-3 mr-0.5" />
-                      {diasPrazo}d
-                    </Badge>
-                  )}
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                  <InfoItem label="Tribunal" value={processo.tribunal || "--"} />
+                  <InfoItem label="Área" value={processo.area || "--"} />
+                  <InfoItem label="Valor" value={formatCurrency(processo.valorCausa || 0)} />
+                  <InfoItem
+                    label="Última sync"
+                    value={formatDateSafe(processo.ultimaSincronizacaoDataJud, "dd/MM HH:mm")}
+                  />
+                </div>
+
+                {/* Movimentações recentes */}
+                {movimentacoesRecentes.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border/60 space-y-1.5">
+                    {movimentacoesRecentes.map((m) => (
+                      <div key={m.id} className="flex items-start gap-2 text-xs">
+                        <Calendar className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
+                        <span className="text-muted-foreground tabular-nums shrink-0">
+                          {formatDateSafe(m.data, "dd/MM")}
+                        </span>
+                        <span className="truncate">{m.descricao}</span>
+                        {m.alertaIa && (
+                          <Badge variant="outline" className="text-xs shrink-0 bg-primary/5 text-primary border-primary/20">
+                            <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
+                            IA
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Tags */}
+                {(processo.tags || []).length > 0 && (
+                  <div className="flex items-center gap-1.5 mt-3 flex-wrap">
+                    <Tag className="h-3 w-3 text-muted-foreground" />
+                    {processo.tags.map((t) => (
+                      <Badge key={t} variant="secondary" className="text-xs">
+                        {t}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                <InfoItem label="Tribunal" value={processo.tribunal || "--"} />
-                <InfoItem label="Área" value={processo.area || "--"} />
-                <InfoItem label="Valor" value={formatCurrency(processo.valorCausa || 0)} />
-                <InfoItem
-                  label="Última sync"
-                  value={formatDateSafe(processo.ultimaSincronizacaoDataJud, "dd/MM HH:mm")}
-                />
+              <div className="hidden lg:flex items-center">
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </div>
-
-              {/* Movimentações recentes */}
-              {movimentacoesRecentes.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-border/60 space-y-1.5">
-                  {movimentacoesRecentes.map((m) => (
-                    <div key={m.id} className="flex items-start gap-2 text-xs">
-                      <Calendar className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground tabular-nums shrink-0">
-                        {formatDateSafe(m.data, "dd/MM")}
-                      </span>
-                      <span className="truncate">{m.descricao}</span>
-                      {m.alertaIa && (
-                        <Badge variant="outline" className="text-xs shrink-0 bg-primary/5 text-primary border-primary/20">
-                          <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
-                          IA
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Tags */}
-              {(processo.tags || []).length > 0 && (
-                <div className="flex items-center gap-1.5 mt-3 flex-wrap">
-                  <Tag className="h-3 w-3 text-muted-foreground" />
-                  {processo.tags.map((t) => (
-                    <Badge key={t} variant="secondary" className="text-xs">
-                      {t}
-                    </Badge>
-                  ))}
-                </div>
-              )}
             </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-            <div className="hidden lg:flex items-center">
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </div>
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[420px]" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Excluir Processo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground space-y-2">
+            <p>
+              Tem certeza que deseja excluir o processo <strong className="font-mono text-foreground">{processo.numeroCnj}</strong>?
+            </p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-md border border-amber-500/20">
+              Esta ação removerá o processo do sistema e do banco de dados do escritório.
+            </p>
           </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteModal(false);
+              }}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="gap-1.5"
+            >
+              {isDeleting ? "Excluindo..." : "Sim, Excluir Processo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -914,6 +988,10 @@ function KanbanColumn({
 }
 
 function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => void }) {
+  const { removeProcesso } = useAppStore();
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   const prazoFatalDate = safeDate(processo.datasImportantes?.prazoFatal);
   const diasPrazo = prazoFatalDate ? differenceInDays(prazoFatalDate, new Date()) : null;
 
@@ -921,55 +999,126 @@ function KanbanCard({ processo, onOpen }: { processo: Processo; onOpen: () => vo
     e.dataTransfer.setData("text/plain", processo.id);
   }
 
-  return (
-    <Card 
-      className="cursor-grab active:cursor-grabbing hover:border-primary/40 hover:shadow-md transition-all"
-      draggable
-      onDragStart={handleDragStart}
-      onClick={onOpen}
-    >
-      <CardContent className="p-3.5 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "text-xs px-1.5 py-0",
-              processo.risco === "Alto" && "border-destructive/30 bg-destructive/10 text-destructive",
-              processo.risco === "Médio" && "border-warning/30 bg-warning/10 text-warning",
-              processo.risco === "Baixo" && "border-success/30 bg-success/10 text-success"
-            )}
-          >
-            Risco {processo.risco || "Médio"}
-          </Badge>
-          <span className="text-xs text-muted-foreground font-mono bg-muted px-1.5 rounded-sm">
-            {processo.numeroCnj ? processo.numeroCnj.split("-")[0] : ""}
-          </span>
-        </div>
-        
-        <div>
-          <p className="font-semibold text-sm leading-tight line-clamp-2">{processo.clienteNome || "Sem cliente"}</p>
-          <p className="text-xs text-muted-foreground mt-1 truncate">{processo.assunto || "Sem assunto"}</p>
-        </div>
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    setIsDeleting(true);
+    try {
+      await removeProcesso(processo.id);
+      toast.success(`Processo ${processo.numeroCnj || ""} excluído!`);
+    } catch (err) {
+      toast.error("Erro ao excluir processo");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  }
 
-        <div className="flex items-center justify-between pt-3 border-t border-border/60">
-          <div className="flex items-center gap-1.5 min-w-0 pr-2">
-            <div className="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-              {(processo.area || "Cível").slice(0, 1)}
+  return (
+    <>
+      <Card 
+        className="cursor-grab active:cursor-grabbing hover:border-primary/40 hover:shadow-md transition-all group"
+        draggable
+        onDragStart={handleDragStart}
+        onClick={onOpen}
+      >
+        <CardContent className="p-3.5 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-xs px-1.5 py-0",
+                processo.risco === "Alto" && "border-destructive/30 bg-destructive/10 text-destructive",
+                processo.risco === "Médio" && "border-warning/30 bg-warning/10 text-warning",
+                processo.risco === "Baixo" && "border-success/30 bg-success/10 text-success"
+              )}
+            >
+              Risco {processo.risco || "Médio"}
+            </Badge>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-muted-foreground font-mono bg-muted px-1.5 rounded-sm">
+                {processo.numeroCnj ? processo.numeroCnj.split("-")[0] : ""}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteModal(true);
+                }}
+                title="Excluir processo"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
             </div>
-            <span className="text-xs text-muted-foreground truncate">{processo.tribunal || "--"}</span>
           </div>
           
-          {diasPrazo !== null && (
-            <div className={cn(
-              "flex items-center gap-1 text-xs font-medium shrink-0",
-              diasPrazo <= 7 ? "text-destructive" : diasPrazo <= 15 ? "text-warning" : "text-muted-foreground"
-            )}>
-              <Clock className="w-3.5 h-3.5" />
-              {diasPrazo}d
+          <div>
+            <p className="font-semibold text-sm leading-tight line-clamp-2">{processo.clienteNome || "Sem cliente"}</p>
+            <p className="text-xs text-muted-foreground mt-1 truncate">{processo.assunto || "Sem assunto"}</p>
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t border-border/60">
+            <div className="flex items-center gap-1.5 min-w-0 pr-2">
+              <div className="w-5 h-5 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                {(processo.area || "Cível").slice(0, 1)}
+              </div>
+              <span className="text-xs text-muted-foreground truncate">{processo.tribunal || "--"}</span>
             </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            
+            {diasPrazo !== null && (
+              <div className={cn(
+                "flex items-center gap-1 text-xs font-medium shrink-0",
+                diasPrazo <= 7 ? "text-destructive" : diasPrazo <= 15 ? "text-warning" : "text-muted-foreground"
+              )}>
+                <Clock className="w-3.5 h-3.5" />
+                {diasPrazo}d
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[420px]" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Excluir Processo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground space-y-2">
+            <p>
+              Tem certeza que deseja excluir o processo <strong className="font-mono text-foreground">{processo.numeroCnj}</strong>?
+            </p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-md border border-amber-500/20">
+              Esta ação removerá o processo do sistema e do banco de dados do escritório.
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteModal(false);
+              }}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="gap-1.5"
+            >
+              {isDeleting ? "Excluindo..." : "Sim, Excluir Processo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
