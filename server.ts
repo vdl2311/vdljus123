@@ -363,107 +363,179 @@ Retorne um JSON válido com o formato:
     }
   });
 
-  // Função auxiliar de consulta DataJud em memória
+  // Função de mapeamento de tribunal a partir dos 20 dígitos do CNJ
+  function getTribunalInfoFromCnj(cnjDigits: string) {
+    if (cnjDigits.length !== 20) {
+      return { alias: "api_publica_tjsp", tribunal: "TJSP", comarca: "São Paulo/SP", segmentoNome: "Justiça Estadual" };
+    }
+
+    const J = cnjDigits.substring(13, 14);
+    const TR = cnjDigits.substring(14, 16);
+
+    if (J === "1") return { alias: "api_publica_stf", tribunal: "STF", comarca: "Brasília/DF", segmentoNome: "Supremo Tribunal Federal" };
+    if (J === "2") return { alias: "api_publica_stj", tribunal: "STJ", comarca: "Brasília/DF", segmentoNome: "Superior Tribunal de Justiça" };
+    if (J === "3") return { alias: "api_publica_tst", tribunal: "TST", comarca: "Brasília/DF", segmentoNome: "Tribunal Superior do Trabalho" };
+
+    if (J === "4") {
+      const trNum = parseInt(TR, 10);
+      const validTrf = (trNum >= 1 && trNum <= 6) ? trNum : 3;
+      const cities: Record<number, string> = { 1: "Brasília/DF", 2: "Rio de Janeiro/RJ", 3: "São Paulo/SP", 4: "Porto Alegre/RS", 5: "Recife/PE", 6: "Belo Horizonte/MG" };
+      return { alias: `api_publica_trf${validTrf}`, tribunal: `TRF-${validTrf}`, comarca: cities[validTrf] || "São Paulo/SP", segmentoNome: "Justiça Federal" };
+    }
+
+    if (J === "5") {
+      const trNum = parseInt(TR, 10);
+      const validTrt = (trNum >= 1 && trNum <= 24) ? trNum : 2;
+      const trtUfMap: Record<number, string> = {
+        1: "Rio de Janeiro/RJ", 2: "São Paulo/SP", 3: "Belo Horizonte/MG", 4: "Porto Alegre/RS", 5: "Salvador/BA",
+        6: "Recife/PE", 7: "Fortaleza/CE", 8: "Belém/PA", 9: "Curitiba/PR", 10: "Brasília/DF",
+        11: "Manaus/AM", 12: "Florianópolis/SC", 13: "João Pessoa/PB", 14: "Porto Velho/RO", 15: "Campinas/SP",
+        16: "São Luís/MA", 17: "Vitória/ES", 18: "Goiânia/GO", 19: "Maceió/AL", 20: "Aracaju/SE",
+        21: "Natal/RN", 22: "Teresina/PI", 23: "Cuiabá/MT", 24: "Campo Grande/MS"
+      };
+      return { alias: `api_publica_trt${validTrt}`, tribunal: `TRT-${validTrt}`, comarca: trtUfMap[validTrt] || "São Paulo/SP", segmentoNome: "Justiça do Trabalho" };
+    }
+
+    if (J === "6") {
+      const treUfMap: Record<string, string> = {
+        "01": "ac", "02": "al", "03": "am", "04": "ap", "05": "ba", "06": "ce", "07": "df", "08": "es", "09": "go",
+        "10": "ma", "11": "mg", "12": "ms", "13": "mt", "14": "pa", "15": "pb", "16": "pe", "17": "pi", "18": "pr",
+        "19": "rj", "20": "rn", "21": "ro", "22": "rr", "23": "rs", "24": "sc", "25": "se", "26": "sp", "27": "to"
+      };
+      const uf = treUfMap[TR] || "sp";
+      return { alias: `api_publica_tre-${uf}`, tribunal: `TRE-${uf.toUpperCase()}`, comarca: `Tribunal Regional Eleitoral de ${uf.toUpperCase()}`, segmentoNome: "Justiça Eleitoral" };
+    }
+
+    if (J === "7") return { alias: "api_publica_stm", tribunal: "STM", comarca: "Brasília/DF", segmentoNome: "Justiça Militar da União" };
+
+    if (J === "8") {
+      const tjMap: Record<string, { alias: string; name: string; city: string }> = {
+        "01": { alias: "api_publica_tjac", name: "TJAC", city: "Rio Branco/AC" },
+        "02": { alias: "api_publica_tjal", name: "TJAL", city: "Maceió/AL" },
+        "03": { alias: "api_publica_tjap", name: "TJAP", city: "Macapá/AP" },
+        "04": { alias: "api_publica_tjam", name: "TJAM", city: "Manaus/AM" },
+        "05": { alias: "api_publica_tjba", name: "TJBA", city: "Salvador/BA" },
+        "06": { alias: "api_publica_tjce", name: "TJCE", city: "Fortaleza/CE" },
+        "07": { alias: "api_publica_tjdft", name: "TJDFT", city: "Brasília/DF" },
+        "08": { alias: "api_publica_tjes", name: "TJES", city: "Vitória/ES" },
+        "09": { alias: "api_publica_tjgo", name: "TJGO", city: "Goiânia/GO" },
+        "10": { alias: "api_publica_tjma", name: "TJMA", city: "São Luís/MA" },
+        "11": { alias: "api_publica_tjmt", name: "TJMT", city: "Cuiabá/MT" },
+        "12": { alias: "api_publica_tjms", name: "TJMS", city: "Campo Grande/MS" },
+        "13": { alias: "api_publica_tjmg", name: "TJMG", city: "Belo Horizonte/MG" },
+        "14": { alias: "api_publica_tjpa", name: "TJPA", city: "Belém/PA" },
+        "15": { alias: "api_publica_tjpb", name: "TJPB", city: "João Pessoa/PB" },
+        "16": { alias: "api_publica_tjpr", name: "TJPR", city: "Curitiba/PR" },
+        "17": { alias: "api_publica_tjpe", name: "TJPE", city: "Recife/PE" },
+        "18": { alias: "api_publica_tjpi", name: "TJPI", city: "Teresina/PI" },
+        "19": { alias: "api_publica_tjrj", name: "TJRJ", city: "Rio de Janeiro/RJ" },
+        "20": { alias: "api_publica_tjrn", name: "TJRN", city: "Natal/RN" },
+        "21": { alias: "api_publica_tjrs", name: "TJRS", city: "Porto Alegre/RS" },
+        "22": { alias: "api_publica_tjro", name: "TJRO", city: "Porto Velho/RO" },
+        "23": { alias: "api_publica_tjrr", name: "TJRR", city: "Boa Vista/RR" },
+        "24": { alias: "api_publica_tjsc", name: "TJSC", city: "Florianópolis/SC" },
+        "25": { alias: "api_publica_tjsp", name: "TJSP", city: "São Paulo/SP" },
+        "26": { alias: "api_publica_tjse", name: "TJSE", city: "Aracaju/SE" },
+        "27": { alias: "api_publica_tjto", name: "TJTO", city: "Palmas/TO" },
+      };
+      const tj = tjMap[TR] || { alias: "api_publica_tjsp", name: "TJSP", city: "São Paulo/SP" };
+      return { alias: tj.alias, tribunal: tj.name, comarca: tj.city, segmentoNome: "Justiça Estadual" };
+    }
+
+    if (J === "9") {
+      if (TR === "13") return { alias: "api_publica_tjmmg", tribunal: "TJMMG", comarca: "Belo Horizonte/MG", segmentoNome: "Justiça Militar Estadual" };
+      if (TR === "21") return { alias: "api_publica_tjmrs", tribunal: "TJMRS", comarca: "Porto Alegre/RS", segmentoNome: "Justiça Militar Estadual" };
+      return { alias: "api_publica_tjmsp", tribunal: "TJMSP", comarca: "São Paulo/SP", segmentoNome: "Justiça Militar Estadual" };
+    }
+
+    return { alias: "api_publica_tjsp", tribunal: "TJSP", comarca: "São Paulo/SP", segmentoNome: "Justiça Estadual" };
+  }
+
+  // Função auxiliar de consulta DataJud
   async function processarConsultaDataJud(numeroCnj: string) {
     const cleanCnj = String(numeroCnj).replace(/\D/g, "");
     const hoje = new Date().toISOString().split("T")[0];
     const ontem = new Date(Date.now() - 86400000).toISOString().split("T")[0];
     const semanaPassada = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
 
-    let tribunal = "TJSP";
-    let comarca = "São Paulo/SP";
+    const info = getTribunalInfoFromCnj(cleanCnj);
+
+    let tribunal = info.tribunal;
+    let comarca = info.comarca;
     let classe = "Procedimento Comum Cível";
     let assunto = "Indenização por Dano Moral";
     let area = "Cível";
     let poloAtivo = "João da Silva";
     let poloPassivo = "Empresa XPTO S.A.";
     let valorCausa = 85000;
-    let orgao = "1ª Vara Cível - Foro Central Cível";
+    let orgao = `1ª Vara Cível - ${comarca}`;
 
-    if (cleanCnj.length === 20) {
-      const segmento = cleanCnj.substring(13, 14);
-      const tr = cleanCnj.substring(14, 16);
-
-      if (segmento === "5") {
-        tribunal = tr === "02" ? "TRT-2 (SP)" : tr === "01" ? "TRT-1 (RJ)" : tr === "15" ? "TRT-15 (Campinas)" : `TRT-${tr}`;
-        comarca = tr === "02" ? "São Paulo/SP" : tr === "01" ? "Rio de Janeiro/RJ" : "Campinas/SP";
-        classe = "Ação Trabalhista - Rito Ordinário";
-        assunto = "Verbas Rescisórias / Horas Extras / Adicional de Insalubridade";
-        area = "Trabalhista";
-        poloAtivo = "Carlos Eduardo Oliveira";
-        poloPassivo = "Logística & Transportes Brasil Ltda";
-        valorCausa = 120000;
-        orgao = "3ª Vara do Trabalho";
-      } else if (segmento === "4") {
-        tribunal = `TRF-${parseInt(tr, 10) || 3}`;
-        comarca = "Seção Judiciária de São Paulo";
-        classe = "Execução Fiscal";
-        assunto = "Dívida Ativa da União / PIS-COFINS";
-        area = "Tributário";
-        poloAtivo = "União Federal (Fazenda Nacional)";
-        poloPassivo = "Indústria Metalúrgica Paulista S.A.";
-        valorCausa = 450000;
-        orgao = "2ª Vara Cível Federal";
-      } else if (segmento === "8") {
-        if (tr === "19") {
-          tribunal = "TJRJ";
-          comarca = "Rio de Janeiro/RJ - Comarca da Capital";
-        } else if (tr === "13") {
-          tribunal = "TJMG";
-          comarca = "Belo Horizonte/MG";
-        } else {
-          tribunal = "TJSP";
-          comarca = "São Paulo/SP";
-        }
-      }
+    if (info.segmentoNome === "Justiça do Trabalho") {
+      classe = "Ação Trabalhista - Rito Ordinário";
+      assunto = "Verbas Rescisórias / Horas Extras / Adicional de Insalubridade";
+      area = "Trabalhista";
+      poloAtivo = "Carlos Eduardo Oliveira";
+      poloPassivo = "Logística & Transportes Brasil Ltda";
+      valorCausa = 120000;
+      orgao = `3ª Vara do Trabalho de ${comarca.split("/")[0]}`;
+    } else if (info.segmentoNome === "Justiça Federal") {
+      classe = "Execução Fiscal";
+      assunto = "Dívida Ativa da União / PIS-COFINS";
+      area = "Tributário";
+      poloAtivo = "União Federal (Fazenda Nacional)";
+      poloPassivo = "Indústria Metalúrgica Paulista S.A.";
+      valorCausa = 450000;
+      orgao = "2ª Vara Cível Federal";
     }
 
-    if (process.env.DATAJUD_API_KEY) {
-      try {
-        const endpoint = `https://api-publica.datajud.cnj.jus.br/api_publica_${tribunal.toLowerCase().replace(/[^a-z0-9]/g, "")}/_search`;
-        const apiRes = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `APIKey ${process.env.DATAJUD_API_KEY}`,
-          },
-          body: JSON.stringify({
-            query: { match: { numeroProcesso: cleanCnj } },
-          }),
-        });
+    // Tenta consulta oficial à API Pública do DataJud (CNJ)
+    const apiKey = process.env.DATAJUD_API_KEY || "c2Vydmljb2J1c2NhZGF0YWp1ZDpjc2pOT1RSMTky";
+    try {
+      const endpoint = `https://api-publica.datajud.cnj.jus.br/${info.alias}/_search`;
+      const apiRes = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `APIKey ${apiKey}`,
+        },
+        body: JSON.stringify({
+          query: { match: { numeroProcesso: cleanCnj } },
+        }),
+      });
 
-        if (apiRes.ok) {
-          const djJson = await apiRes.json();
-          const hit = djJson.hits?.hits?.[0]?._source;
-          if (hit) {
-            return {
-              numeroCnj: hit.numeroProcesso || numeroCnj,
-              tribunal: hit.tribunal || tribunal,
-              comarca: hit.orgaoJulgador?.nome || comarca,
-              classe: hit.classe?.nome || classe,
-              assunto:
-                (Array.isArray(hit.assuntos) && hit.assuntos.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
-                (Array.isArray(hit.assunto) && hit.assunto.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
-                hit.assuntoPrincipal?.nome ||
-                (typeof hit.assunto === "string" ? hit.assunto : null) ||
-                assunto,
-              area: area,
-              poloAtivo: hit.partes?.find((p: any) => p.polo === "AT")?.nome || poloAtivo,
-              poloPassivo: hit.partes?.find((p: any) => p.polo === "PA")?.nome || poloPassivo,
-              valorCausa: hit.valorCausa || valorCausa,
-              dataDistribuicao: hit.dataAjuizamento ? hit.dataAjuizamento.substring(0, 10) : semanaPassada,
-              movimentacoes: (hit.movimentos || []).map((m: any) => ({
-                data: m.dataHora ? m.dataHora.substring(0, 10) : hoje,
-                descricao: m.nome || m.complemento || "Movimentação processual registrada",
-                fonte: "DataJud",
-                orgao: hit.orgaoJulgador?.nome || orgao,
-              })),
-            };
-          }
+      if (apiRes.ok) {
+        const djJson = await apiRes.json();
+        const hit = djJson.hits?.hits?.[0]?._source;
+        if (hit) {
+          const assuntosLista =
+            (Array.isArray(hit.assuntos) && hit.assuntos.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+            (Array.isArray(hit.assunto) && hit.assunto.map((a: any) => typeof a === "string" ? a : a.nome || a.descricao).filter(Boolean).join(" / ")) ||
+            hit.assuntoPrincipal?.nome ||
+            (typeof hit.assunto === "string" ? hit.assunto : null) ||
+            assunto;
+
+          return {
+            numeroCnj: hit.numeroProcesso || numeroCnj,
+            tribunal: hit.tribunal || tribunal,
+            comarca: hit.orgaoJulgador?.nome || comarca,
+            classe: hit.classe?.nome || classe,
+            assunto: assuntosLista,
+            area: area,
+            poloAtivo: hit.partes?.find((p: any) => p.polo === "AT")?.nome || poloAtivo,
+            poloPassivo: hit.partes?.find((p: any) => p.polo === "PA")?.nome || poloPassivo,
+            valorCausa: hit.valorCausa || valorCausa,
+            dataDistribuicao: hit.dataAjuizamento ? hit.dataAjuizamento.substring(0, 10) : semanaPassada,
+            movimentacoes: (hit.movimentos || []).map((m: any) => ({
+              data: m.dataHora ? m.dataHora.substring(0, 10) : hoje,
+              descricao: m.nome || m.complemento || "Movimentação processual registrada",
+              fonte: "DataJud",
+              orgao: hit.orgaoJulgador?.nome || orgao,
+            })),
+          };
         }
-      } catch (apiErr) {
-        console.warn("Falha na chamada direta à API do DataJud:", apiErr);
       }
+    } catch (apiErr) {
+      console.warn("Falha na chamada direta à API do DataJud:", apiErr);
     }
 
     return {
