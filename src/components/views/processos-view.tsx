@@ -380,11 +380,11 @@ export function ProcessosView() {
                   </DialogHeader>
 
                   <Tabs defaultValue="manual" className="w-full mt-2">
-                    <TabsList className="grid w-full grid-cols-2 h-9 mb-4">
-                      <TabsTrigger value="manual" className="text-xs font-semibold">
+                    <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 h-auto p-1 mb-4 gap-1">
+                      <TabsTrigger value="manual" className="text-xs font-semibold h-auto py-2 px-2 whitespace-normal text-center leading-tight">
                         Formulário Completo (Manual)
                       </TabsTrigger>
-                      <TabsTrigger value="datajud" className="text-xs font-semibold">
+                      <TabsTrigger value="datajud" className="text-xs font-semibold h-auto py-2 px-2 whitespace-normal text-center leading-tight">
                         Importar via DataJud (CNJ)
                       </TabsTrigger>
                     </TabsList>

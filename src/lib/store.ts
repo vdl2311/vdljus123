@@ -61,7 +61,9 @@ interface AppState {
   addProcesso: (p: Processo) => void;
   updateProcesso: (id: string, patch: Partial<Processo>) => void;
   addCliente: (c: Cliente) => void;
+  removeCliente: (id: string) => Promise<void>;
   addTarefa: (t: Tarefa) => void;
+  removeProcesso: (id: string) => Promise<void>;
   updateTarefa: (id: string, patch: Partial<Tarefa>) => void;
   removeTarefa: (id: string) => void;
   marcarInboxLido: (id: string) => void;
@@ -249,6 +251,34 @@ export const useAppStore = create<AppState>((set, get) => ({
       logger.action("Cliente criado no Firestore", { id: cleanC.id, nome: cleanC.nome });
     } catch (error) {
       logger.error("system", "Erro ao criar cliente no Firestore", error);
+    }
+  },
+  removeCliente: async (id: string) => {
+    set((s) => {
+      const updated = s.clientes.filter((c) => c.id !== id);
+      setLocal(STORAGE_KEYS.CLIENTES, updated);
+      return { clientes: updated };
+    });
+
+    try {
+      await deleteDoc(doc(db, "clientes", id));
+      logger.action("Cliente removido no Firestore", { id });
+    } catch (error) {
+      logger.error("system", "Erro ao remover cliente no Firestore", error);
+    }
+  },
+  removeProcesso: async (id: string) => {
+    set((s) => {
+      const updated = s.processos.filter((p) => p.id !== id);
+      setLocal(STORAGE_KEYS.PROCESSOS, updated);
+      return { processos: updated };
+    });
+
+    try {
+      await deleteDoc(doc(db, "processos", id));
+      logger.action("Processo removido no Firestore", { id });
+    } catch (error) {
+      logger.error("system", "Erro ao remover processo no Firestore", error);
     }
   },
   addTarefa: async (t) => {

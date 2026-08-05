@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Calendar,
   Briefcase,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -150,8 +151,23 @@ function ClienteCard({
   onOpenProcesso: (id: string) => void;
   index: number;
 }) {
-  const { processos } = useAppStore();
+  const { processos, removeCliente } = useAppStore();
+  const [showConfirmDelete, setShowConfirmDelete] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const clienteProcessos = processos.filter((p) => p.clienteId === cliente.id);
+
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+      await removeCliente(cliente.id);
+      toast.success(`Cliente "${cliente.nome}" excluído com sucesso!`);
+      setShowConfirmDelete(false);
+    } catch (e) {
+      toast.error("Erro ao excluir cliente");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <motion.div
@@ -187,17 +203,28 @@ function ClienteCard({
                 <h3 className="font-semibold text-sm leading-tight truncate">
                   {cliente.nome}
                 </h3>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-xs shrink-0",
-                    cliente.status === "Ativo" && "border-success/40 text-success",
-                    cliente.status === "Potencial" && "border-info/40 text-info",
-                    cliente.status === "Inativo" && "border-muted-foreground/40"
-                  )}
-                >
-                  {cliente.status}
-                </Badge>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-xs",
+                      cliente.status === "Ativo" && "border-success/40 text-success",
+                      cliente.status === "Potencial" && "border-info/40 text-info",
+                      cliente.status === "Inativo" && "border-muted-foreground/40"
+                    )}
+                  >
+                    {cliente.status}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    title="Excluir cliente"
+                    onClick={() => setShowConfirmDelete(true)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {cliente.tipo === "PJ" ? "Pessoa Jurídica" : "Pessoa Física"} ·{" "}
@@ -278,6 +305,47 @@ function ClienteCard({
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de confirmação de exclusão */}
+      <Dialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Excluir Cliente
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground space-y-2">
+            <p>
+              Tem certeza que deseja excluir o cliente <strong className="text-foreground">{cliente.nome}</strong> ({cliente.cpfCnpj})?
+            </p>
+            {totalProcessos > 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2.5 rounded-md border border-amber-500/20">
+                Atenção: Este cliente possui <strong>{totalProcessos} processo(s) vinculado(s)</strong> no sistema.
+              </p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowConfirmDelete(false)}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="gap-1.5"
+            >
+              {isDeleting ? "Excluindo..." : "Sim, Excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
