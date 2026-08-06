@@ -10,6 +10,8 @@ import type {
   InboxJuridicoItem,
   AiChatMessage,
   Notificacao,
+  LancamentoFinanceiro,
+  LancamentoStatus,
 } from "./types";
 import {
   processos as seedProcessos,
@@ -19,6 +21,7 @@ import {
   inboxItens as seedInbox,
   notificacoes as seedNotificacoes,
   membrosEquipe as seedEquipe,
+  lancamentosFinanceiros as seedLancamentos,
 } from "./seed-data";
 
 interface AppState {
@@ -35,6 +38,7 @@ interface AppState {
   clientes: Cliente[];
   tarefas: Tarefa[];
   documentos: Documento[];
+  lancamentos: LancamentoFinanceiro[];
   inbox: InboxJuridicoItem[];
   notificacoes: Notificacao[];
   chatMessages: AiChatMessage[];
@@ -66,6 +70,9 @@ interface AppState {
   removeProcesso: (id: string) => Promise<void>;
   updateTarefa: (id: string, patch: Partial<Tarefa>) => void;
   removeTarefa: (id: string) => void;
+  addLancamento: (l: LancamentoFinanceiro) => Promise<void>;
+  removeLancamento: (id: string) => Promise<void>;
+  updateLancamentoStatus: (id: string, status: LancamentoStatus, dataPagamento?: string) => Promise<void>;
   marcarInboxLido: (id: string) => void;
   arquivarInbox: (id: string) => void;
   marcarNotificacaoLida: (id: string) => void;
@@ -121,6 +128,7 @@ const STORAGE_KEYS = {
   CLIENTES: "vdl_juris_clientes_v2",
   TAREFAS: "vdl_juris_tarefas_v2",
   DOCUMENTOS: "vdl_juris_documentos_v2",
+  LANCAMENTOS: "vdl_juris_lancamentos_v2",
 };
 
 function getLocal<T>(key: string, fallback: T): T {
@@ -182,6 +190,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   clientes: getLocal(STORAGE_KEYS.CLIENTES, seedClientes),
   tarefas: getLocal(STORAGE_KEYS.TAREFAS, seedTarefas),
   documentos: getLocal(STORAGE_KEYS.DOCUMENTOS, seedDocumentos),
+  lancamentos: getLocal(STORAGE_KEYS.LANCAMENTOS, seedLancamentos),
   inbox: seedInbox,
   notificacoes: seedNotificacoes,
   chatMessages: [],
@@ -326,6 +335,55 @@ export const useAppStore = create<AppState>((set, get) => ({
       logger.action("Tarefa removida no Firestore", { id });
     } catch (error) {
       logger.error("system", "Erro ao remover tarefa no Firestore", error);
+    }
+  },
+  addLancamento: async (l) => {
+    const cleanL = cleanForFirestore(l);
+    set((s) => {
+      const filtered = s.lancamentos.filter((existing) => existing.id !== cleanL.id);
+      const updated = [cleanL, ...filtered];
+      setLocal(STORAGE_KEYS.LANCAMENTOS, updated);
+      return { lancamentos: updated };
+    });
+
+    try {
+      await setDoc(doc(db, "lancamentos", cleanL.id), cleanL);
+      logger.action("Lançamento criado no Firestore", { id: cleanL.id, descricao: cleanL.descricao, valor: cleanL.valor });
+    } catch (error) {
+      logger.error("system", "Erro ao criar lançamento no Firestore", error);
+    }
+  },
+  removeLancamento: async (id) => {
+    set((s) => {
+      const updated = s.lancamentos.filter((l) => l.id !== id);
+      setLocal(STORAGE_KEYS.LANCAMENTOS, updated);
+      return { lancamentos: updated };
+    });
+
+    try {
+      await deleteDoc(doc(db, "lancamentos", id));
+      logger.action("Lançamento removido do Firestore", { id });
+    } catch (error) {
+      logger.error("system", "Erro ao remover lançamento do Firestore", error);
+    }
+  },
+  updateLancamentoStatus: async (id, status, dataPagamento) => {
+    const patch: Partial<LancamentoFinanceiro> = { status };
+    if (dataPagamento) patch.dataPagamento = dataPagamento;
+
+    set((s) => {
+      const updated = s.lancamentos.map((l) =>
+        l.id === id ? { ...l, ...patch } : l
+      );
+      setLocal(STORAGE_KEYS.LANCAMENTOS, updated);
+      return { lancamentos: updated };
+    });
+
+    try {
+      await updateDoc(doc(db, "lancamentos", id), cleanForFirestore(patch) as any);
+      logger.action("Status do lançamento atualizado no Firestore", { id, status });
+    } catch (error) {
+      logger.error("system", "Erro ao atualizar status do lançamento no Firestore", error);
     }
   },
   marcarInboxLido: (id) =>
@@ -674,6 +732,32 @@ export const useAppStore = create<AppState>((set, get) => ({
         },
         (error) => {
           logger.warn("system", "Firestore info on documentos snapshot", error);
+        }
+      );
+
+      // Listen to Lancamentos
+      onSnapshot(
+        collection(db, "lancamentos"),
+        (snapshot) => {
+          const firestoreLancamentos = snapshot.docs.map((doc) => doc.data() as LancamentoFinanceiro);
+          if (firestoreLancamentos.length > 0) {
+            set((s) => {
+              const map = new Map<string, LancamentoFinanceiro>();
+              s.lancamentos.forEach((l) => map.set(l.id, l));
+              firestoreLancamentos.forEach((l) => map.set(l.id, l));
+              const merged = Array.from(map.values()).sort((a, b) => new Date(b.dataVencimento).getTime() - new Date(a.dataVencimento).getTime());
+              setLocal(STORAGE_KEYS.LANCAMENTOS, merged);
+              return { lancamentos: merged };
+            });
+          } else {
+            const current = get().lancamentos;
+            current.forEach((l) => {
+              setDoc(doc(db, "lancamentos", l.id), cleanForFirestore(l)).catch(() => {});
+            });
+          }
+        },
+        (error) => {
+          logger.warn("system", "Firestore info on lancamentos snapshot", error);
         }
       );
 
